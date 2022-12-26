@@ -1,0 +1,19 @@
+<header class="titlecard-header">
+    <h1 class="title">Quiz Game</h1>
+</header>
+{{#if loggedIn}}
+    <p>Welcome, {{username}}</p>
+    <div class="login-homepage-buttons">
+        <h2>Your actions:</h2>
+        <div class="actions-container">
+            <p><a href="/yourpage">Visit your page</a></p>
+            <p class="text">or</p>
+            <p><a href="/logout">Logout</a></p>
+        </div>
+    </div>
+{{else}}
+    <div class="homepage-actions">
+        <a href="/register">Register</a>        
+        <a href="/login">Login</a>
+    </div>
+{{/if}}

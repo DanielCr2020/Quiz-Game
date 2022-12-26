@@ -1,0 +1,18 @@
+<main>
+    <div class="titlecard-header">
+        <h1 class="title">Register an Account</h1>
+    </div>
+    <p class="error-p">{{errorMessage}}</p>
+    <form action="/register" method="POST" id="login-form" class="login-form">
+        <label for="usernameInput">Username:</label>
+        <input id="usernameInput" type="text" name="usernameInput"> <br>
+        <label for="passwordInput">Password:</label>
+        <input id="passwordInput" type="password" name="passwordInput"> <br>
+        <button type="submit">Register</button>
+    </form>
+</main>
+<footer>
+    <nav>
+        <a href="/login">Already have an account? Click here to log in</a>
+    </nav>
+</footer>

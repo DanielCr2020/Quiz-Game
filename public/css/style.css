@@ -1,0 +1,95 @@
+:root {
+    --bg-gray: rgb(10,15,35);
+    --text-blue: rgb(100,155,255);
+}
+/*General*/
+html, body {
+    background-color: var(--bg-gray)
+}
+label {
+    color:var(--text-blue);
+    text-align: center;
+}
+header {
+    background-color: rgb(0,25,65);
+    color:white;
+    font-size: 32px;
+}
+.error-p {
+    font-size: 30px;
+    text-align: center;
+    color:red;
+}
+p {
+    color:green;
+    text-align: center;
+    font-size: 24px;
+}
+h2 {
+    text-align: center;
+    color:rgb(200,255,200);
+    font-size: 36px;
+}
+/*Login form*/
+.login-form {
+    font-size: 60px;
+    text-align: center;
+}
+.login-form input {
+    font-size: 50px;
+}
+.login-form button {
+    font-size:50px;
+    border-radius: 20px;
+}
+.login-form button:hover {
+    background-color: black;
+    color:white;
+    border-color: white;
+    transition: 0.25s;
+}
+/*Titles for pages*/
+.title {
+    color:var(--text-blue);
+}
+.titlecard-header {
+    width: 100%;
+    padding: 48px 0;
+    text-align: center;
+    background-color: var(--titlecard-gray);
+    margin: 12px 0;
+}
+.titlecard-header .title {
+    font-size: 63px;
+    margin: 20px 0 10px;
+}
+/*Navigation <a>*/
+.align-right  {
+    text-align: right;
+}
+/*Homepage actions*/
+.homepage-actions {
+    text-align: center;
+    font-size: 50px;
+}
+.homepage-actions a {
+    color:var(--text-blue);
+}
+.homepage-actions a:hover {
+    font-size: 90px;
+    transition: 0.25s;
+}
+/*view decks*/
+.view-decks {
+    text-align: center;
+    font-size: 50px;
+}
+.deck-list {
+    font-size: 24px;
+    color:white;
+}
+/*errors*/
+.error {
+    font-size: 30px;
+    color:red;
+}

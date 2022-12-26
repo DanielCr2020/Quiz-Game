@@ -1,0 +1,21 @@
+<main>
+    <div class="titlecard-header">
+        <h1 class="title">{{userName}}'s Decks</h1>
+    </div>
+    <div id="error" class="error" hidden>{{errorMessage}}</div>
+    <form action="/yourpage/decks" method="POST" id="create-deck-form" class="create-deck-form">
+        <label for="decknameInput">Deck name:</label><input id="decknameInput" type="text" name="decknameInput"><br>
+        <label for="decksubjectInput">Deck subject:</label><input id="decksubjectInput" type="text" name="decksubjectInput">
+        <button type="submit" class="submit-button">Create Deck</button>
+    </form>
+    <ol id="deck-list" class="deck-list">
+        {{#each deck}}
+            <li><a href="decks/{{this._id}}">{{this.name}}</a> - Subject: {{this.subject}}</li>
+        {{/each}}
+    </ol>
+    <footer>
+        <nav>
+            <a href="/yourpage">Back to your profile</a>
+        </nav>
+    </footer>
+</main>
