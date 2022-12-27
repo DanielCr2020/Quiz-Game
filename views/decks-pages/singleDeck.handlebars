@@ -1,9 +1,36 @@
 <main>
     <header><br>Created on: {{dateCreated}}</header>
-    <nav>
-        <div class="align-right">
-            <button type="submit" class="delete-deck" id="delete-deck">Delete this deck</button>
+    <div class="left-column">
+        <h1 id="deckName" class="deckName">{{deckName}}</h1>
+        <h2 id="deckSubject" class="deckSubject">{{deckSubject}}</h2>
+        <div class="deck-page-column">
+            <ol id="deck-list" class="deck-list">
+                {{#each card}}
+                    <li><a href="decks/{{../id}}/{{this.number}}"> {{this.front}} : {{this.back}}</a></li>
+                {{/each}}
+            </ol>
         </div>
-        <a href="/yourpage/decks">Back to your decks</a>
-    </nav>
+    </div>
+    <div id="error" class="error" hidden>{{errorMessage}}</div>
+    <form action="/yourpage/decks/{{id}}" id="edit-deck-form" class="create-deck-form">
+        <label for="decknameInput">Enter new deck name</label> <br>
+        <input id="decknameInput" type="text" name="decknameInput"><br>
+        <label for="decksubjectInput">Enter new deck subject</label> <br>
+        <input id="decksubjectInput" type="text" name="decksubjectInput"> <br>
+        <label for="isDeckPublic">Is this deck public?</label>
+        {{#if public}}          <!-- if the deck is already public -->
+            <input id="isDeckPublic" type="checkbox" name="isDeckPublic" checked>
+        {{else}}
+            <input id="isDeckPublic" type="checkbox" name="isDeckPublic">
+        {{/if}}
+        <br><button type="submit">Update deck</button>
+    </form>
+    <footer>
+        <nav>
+            <div class="align-right">
+                <button type="submit" class="delete-deck" id="delete-deck">Delete this deck</button>
+            </div>
+            <a href="/yourpage/decks">Back to your decks</a>
+        </nav>
+    </footer>
 </main>

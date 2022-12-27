@@ -7,8 +7,8 @@ const validation=require('../validation')
 const xss=require('xss')
 //      /yourpage/decks
 router
-    .route('/')         //getting a user's decks
-    .get(async(req,res) => {
+    .route('/')         
+    .get(async(req,res) => {        //getting a user's decks
         if(!req.body) res.sendStatus(400)
         let username=undefined; let yourDecks=undefined;
         try{
@@ -58,10 +58,8 @@ router
             return
         }
         //was able to create deck
-        console.log(newDeck)
         name=newDeck.name
         subject=newDeck.subject
-        console.log(name,subject)
         res.json({
             title:username,
             subject:subject,
@@ -76,27 +74,68 @@ router
 
 router
     .route('/:id')
-    .get(async(req,res) => {                //      /:id    get     showing a user's decks
+    .get(async(req,res) => {                //      /:id    get     showing a user's decks (singleDeck)
         if(!req.body) res.sendStatus(400)
         let username=undefined; let id=undefined; let deck=undefined;
         try{
             username=validation.checkUsername(req.session.user.username)
             id=validation.checkId(req.params.id)
-            deck=await decks.getDeckById(id)
+            deck=await decks.getDeckById(username,id)
         }
         catch(e){
             console.log(e)
-            //if(!yourDecks) res.status(500).send("Internal Server Error (GET /yourpage/decks/:id)")
+            if(!deck) res.status(500).send("Internal Server Error (GET /yourpage/decks/:id)")
             return
         }
         res.render(path.resolve('views/decks-pages/singleDeck.handlebars'),{
-            title:username,
+            title:deck.name,
             userName:username,
-            dateCreated:deck.dateCreated
+            deckName:deck.name,
+            deckSubject:deck.subject,
+            dateCreated:deck.dateCreated,
+            public:deck.public
         })
     })
-    
-    .delete(async(req,res) => {
+    .patch(async(req,res) => {          //      /:id    patch       updating a deck
+        let deckId=undefined;let newDeckName=req.body.name; let newDeckSubject=req.body.subject; let username=undefined;
+        let deckToEdit=undefined;
+        try{
+            deckId=validation.checkId(req.params.id)
+            username=validation.checkUsername(req.session.user.username)
+            deckToEdit=await decks.getDeckById(username,deckId)
+            if(newDeckName) {
+                newDeckName=validation.checkDeckName(newDeckName);
+            }
+            else{
+                newDeckName=validation.checkDeckName(deckToEdit.name)
+            }
+            if(newDeckSubject) {
+                newDeckSubject=validation.checkSubject(newDeckSubject);
+            }
+            else{
+                newDeckSubject=validation.checkSubject(deckToEdit.subject)
+            }
+            await decks.editDeck(username,deckId,newDeckName,newDeckSubject,req.body.public)
+        }
+        catch(e){
+            console.log(e)
+            res.json({
+                title:"Cannot edit deck",
+                error:e.toString(),
+                success:false
+            })
+            return
+        }
+        res.json({
+            title:newDeckName,
+            id:deckId,
+            deckName:newDeckName,
+            deckSubject:newDeckSubject,
+            public:req.body.public,
+            success:true
+        })
+    })
+    .delete(async(req,res) => {             //      /decks/:id  delete route. Deleting a deck
         let id=undefined;
         try{id=validation.checkId(req.params.id)}
         catch(e){

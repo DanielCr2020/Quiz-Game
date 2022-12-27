@@ -1,5 +1,5 @@
 :root {
-    --bg-gray: rgb(10,15,35);
+    --bg-gray: rgb(10,15,20);
     --text-blue: rgb(100,155,255);
 }
 /*General*/
@@ -9,10 +9,14 @@ html, body {
 label {
     color:var(--text-blue);
     text-align: center;
+    font-size: 30px;
 }
 header {
     background-color: rgb(0,25,65);
     color:white;
+    font-size: 32px;
+}
+footer {
     font-size: 32px;
 }
 .error-p {
@@ -63,9 +67,20 @@ h2 {
     font-size: 63px;
     margin: 20px 0 10px;
 }
+header.title {
+    font-size: 60px;
+    margin: 10px;
+    text-align: center;
+}
 /*Navigation <a>*/
 .align-right  {
     text-align: right;
+}
+/*a {
+    font-size: 24px;
+}*/
+a.home {
+    font-size: 28px;
 }
 /*Homepage actions*/
 .homepage-actions {
@@ -85,11 +100,59 @@ h2 {
     font-size: 50px;
 }
 .deck-list {
-    font-size: 24px;
+    font-size: 36px;
     color:white;
+}
+.create-deck-form input,button {
+    font-size: 24px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+.deck-page-content {
+    display:flex;
+    flex-direction: row;
+    justify-content: left;
+    width:80%;
+    margin-left: 10px;
+}
+.deck-page-column {
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    width:200%;
+    margin-left: 60px;
+}
+/*Single deck*/
+h1.deckName.deckName {
+    font-size: 84px;
+    text-align: left;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    color:white;
+    margin: 0px 0px;
+}
+h2.deckSubject.deckSubject {
+    font-size: 40px;
+    text-align: left;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    margin: 0px 0px;
+}
+.left-column {
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 40%;
+    margin-left: 10px;
+}
+.card-page-column {
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    width:100%;
+    margin-left: 30px;
 }
 /*errors*/
 .error {
     font-size: 30px;
     color:red;
+    margin-left: 10px;
 }

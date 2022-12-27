@@ -5,7 +5,8 @@ const session=require('express-session')
 const configRoutes=require('./routes')
 const connection=require('./config/mongoConnection')
 const exphbs=require('express-handlebars')
-
+const decks=require('./data/decks')
+const validation=require('./validation')
 
 app.use('/public',static)
 app.use(express.json())
@@ -32,32 +33,33 @@ app.use('/yourpage', (req, res, next) => {     //redirect to home if not authent
     }
   });
 
-  /*app.use('/yourpage/decks/:id', async (req,res,next) => {     //if the id in the url does not belong to the user's decks (the deck was made by another user, or the deck is invalid)
+  app.use('/yourpage/decks/:id', async (req,res,next) => {     //if the id in the url does not belong to the user's decks (the deck was made by another user, or the deck is invalid)
     if (!req.session.user) {
       return res.redirect('/')
     }
     let id=req.params.id
-    let doesOwn=undefined
+    let username=req.session.user.username
+    try{
+      id=validation.checkId(id)
+      username=validation.checkUsername(username)
+    }
+    catch(e){
+      console.log(e)
+    }
     if(!res.ignore) {   
       try{
-        doesOwn=await decks.doesUserOwnThisDeck(req.session.user.username,id)
+        doesOwn=await decks.getDeckById(username,id)
       }
       catch(e){
-        console.log("checking ownership failed")
+        console.log("You do not own that deck")
         return res.redirect('/yourpage/decks')
       }
-      if(!doesOwn){
-        console.log("You do not own that deck")
-        res.redirect('/yourpage/decks')
-      }
-      else {
-        next();
-      }
+      next()
     }
     else{
       next()
     }
-  })*/
+  })
   app.use('/login', (req, res, next) => {
       if (req.session.user) {
         return res.redirect('/yourpage');
