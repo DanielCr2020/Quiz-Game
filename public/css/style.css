@@ -1,6 +1,7 @@
 :root {
     --bg-gray: rgb(10,15,20);
     --text-blue: rgb(100,155,255);
+    --text-blue2: rgb(30,120,255);
 }
 /*General*/
 html, body {
@@ -19,7 +20,7 @@ header {
 footer {
     font-size: 32px;
 }
-.error-p {
+.error-center {
     font-size: 30px;
     text-align: center;
     color:red;
@@ -136,23 +137,38 @@ h2.deckSubject.deckSubject {
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     margin: 0px 0px;
 }
-.left-column {
+
+.card-page-content {
     display:flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 40%;
-    margin-left: 10px;
+    color:white;
+    font-size: 36px;
+    flex-direction: row;
+    justify-content: right;
+    width:80%;
+    margin-left: 30px;
 }
 .card-page-column {
     display:flex;
     flex-direction: column;
     justify-content: center;
-    width:100%;
-    margin-left: 30px;
+    width:200%;
+    margin-left: 0px;
+}
+.cardFrontInput {
+    font-size: 20px;
+}
+p.create-card-p {
+    font-size: 40px;
+    text-align: left;
+    margin-right:10px;
+    margin-left: 0px;
+    width:120%;
+    font-weight: bold;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color:var(--text-blue2);
 }
 /*errors*/
 .error {
     font-size: 30px;
     color:red;
-    margin-left: 10px;
 }

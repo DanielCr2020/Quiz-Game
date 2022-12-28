@@ -52,7 +52,7 @@ router
                 title:"Cannot create deck",
                 deck:yourDecks,
                 success:false,
-                error:e.toString()
+                error:e
             })
             res.status(400)
             return
@@ -69,7 +69,6 @@ router
             userName:username,
             success:true
         })
-        
     })
 
 router
@@ -90,11 +89,42 @@ router
         res.render(path.resolve('views/decks-pages/singleDeck.handlebars'),{
             title:deck.name,
             userName:username,
+            id:id,
             deckName:deck.name,
             deckSubject:deck.subject,
             dateCreated:deck.dateCreated,
-            public:deck.public
+            public:deck.public,
+            card:deck.cards
         })
+    })
+    .post(async(req,res) => {           //      /:id        post route  (making a new card)
+        if(!req.body) {res.sendStatus(400); return;}
+        let front=undefined; let back=undefined; let username=undefined; let newCard=undefined; let deckId=undefined;
+        try{            //validation
+            front=validation.checkCard(req.body.front,"front")
+            back=validation.checkCard(req.body.back,"back")
+            username=validation.checkUsername(req.session.user.username)
+            deckId=validation.checkId(req.params.id)
+            newCard=await decks.createCard(username,deckId,front,back)
+        }
+        catch(e){
+            console.log(e)
+            res.json({
+                title:"Cannot create card",
+                success:false,
+                error:e
+            })
+            return
+        }
+        res.json({
+            title:front,
+            id:deckId,
+            number:newCard.number,
+            front:front,
+            back:back,
+            success:true
+        })
+
     })
     .patch(async(req,res) => {          //      /:id    patch       updating a deck
         let deckId=undefined;let newDeckName=req.body.name; let newDeckSubject=req.body.subject; let username=undefined;

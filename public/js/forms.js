@@ -6,14 +6,16 @@
     let deckSubjectInput=$('#decksubjectInput')
     //editing a deck
     let editDeckForm=$('#edit-deck-form')
+    //creating a card
+    let createCardForm=$('#create-card-form')
     //errors
     let errorDiv=document.getElementById('error')
+    let errorDiv2=document.getElementById('error2')
 
     //for creating a deck
     createDeckForm.submit(function (event) {
         event.preventDefault();
         let dni=deckNameInput.val().trim(); let dsi=deckSubjectInput.val().trim();
-        
         if(dni && dsi){      //setting up request with name and subject
             let requestConfig = {
                 method: "POST",
@@ -50,8 +52,6 @@
         $.ajax(requestConfig).then(function (responseMessage) {
             if(responseMessage.success){
                 errorDiv.hidden=true
-
-                console.log(responseMessage.deckSubject)
                 if(dni)
                     $('#deckName').replaceWith(`<h1 id="deckName" class="deckName">${responseMessage.deckName}</h1>`)
                 if(dsi)
@@ -85,5 +85,31 @@
                 alert(responseMessage.error)
             }
         })
+    })
+    //for creating a card
+    createCardForm.submit(function (event) {
+        event.preventDefault();
+        let cfi=$('#cardFrontInput').val().trim(); let cbi=$('#cardBackInput').val().trim();
+        if(cfi && cbi){
+            let url=window.location.href.substring(window.location.href.indexOf("/yourpage"));     //gets deck url
+            let requestConfig = {
+                method: "POST",
+                url:url,
+                data:{front:cfi,back:cbi}
+            }
+            $.ajax(requestConfig).then(function (responseMessage) {
+            if(responseMessage.success){
+                errorDiv2.hidden=true
+                let listItem=`<li><a href="decks/${responseMessage.id}/${responseMessage.number}">${responseMessage.front} ||| ${responseMessage.back}</a></li>`
+                deckList.append(listItem)
+            }
+            else{
+                errorDiv2.hidden=false
+                errorDiv2.innerText=responseMessage.error
+                $('#cardFrontInput').focus()
+            }
+            $('#create-card-form').trigger('reset')
+            }
+        )}
     })
 })(window.jQuery)

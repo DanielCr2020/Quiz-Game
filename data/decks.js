@@ -97,10 +97,35 @@ const editDeck = async(username,deckId,newName,newSubject,newPublicity) => {
     return await getDeckById(username,deckId);
 }
 
+const createCard = async(username,deckId,cardFront,cardBack) => {
+    username=validation.checkUsername(username),
+    deckId=validation.checkId(deckId)
+    cardFront=validation.checkCard(cardFront,"front")
+    cardBack=validation.checkCard(cardBack,"back")
+    const userCollection=await users();
+    const userDeck=await getDeckById(username,deckId)
+    for(card of userDeck.cards){
+        if(card.front.toLowerCase()===cardFront.toLowerCase())
+            throw `You already have a card named ${cardFront}`
+    }
+    let newCard={
+        number:userDeck.cards.length,
+        front:cardFront,
+        back:cardBack
+    }
+    const insertCard=await userCollection.updateOne(
+        {username:username,"decks._id":deckId},
+        {$push: {"decks.$.cards":newCard}}
+    )
+    if(insertCard.modifiedCount===0) throw "Could not successfully create card"
+    return newCard
+}
+
 module.exports = {
     createDeck,
     getUsersDecks,
     deleteDeck,
     getDeckById,
-    editDeck
+    editDeck,
+    createCard
 }

@@ -39,7 +39,7 @@ function checkId(id){
 function checkDeckName(deckName){
     if(!deckName) throw new Error("Deck name is not defined")
     if(typeof deckName!=='string') throw new Error("Deck name is not a string")
-    if(deckName.trim().length<2) throw new Error("Deck name must be at least 2 characters")
+    if(deckName.trim().length<2) throw ("Deck name must be at least 2 characters")
     deckName=xss(deckName.trim());
     if(deckName.length>maxLen) throw "Deck name cannot be longer than "+maxLen
     return deckName
@@ -48,10 +48,22 @@ function checkDeckName(deckName){
 function checkSubject(subject){
     if(!subject) throw new Error("Subject is not defined")
     if(typeof subject!=='string') throw new Error("Subject is not a string")
-    if(subject.trim().length<2) throw new Error("Subject must be at least 2 characters")
+    if(subject.trim().length<2) throw ("Subject must be at least 2 characters")
     subject=xss(subject.trim());
     if(subject.length>maxLen) throw "Subject cannot be longer than "+maxLen
     return subject
+}
+
+function checkCard(contents,forb){      //it's forbin time
+    if(!contents) throw new Error(`Card ${forb} is not defined`)
+    if(typeof contents!=='string') throw new Error(`Card ${forb} is not a string`)
+    if(contents.trim().length<2) throw `Card ${forb} must be at least 2 characters`
+    contents=xss(contents.trim());
+    if(forb=='front')
+        if(contents.length>maxFront) throw "Card front cannot be longer than " + maxFront
+    else if(forb=='back')
+        if(contents.length>maxBack) throw "Card back cannot be longer than " + maxBack
+    return contents
 }
 
 module.exports = {
@@ -59,5 +71,6 @@ module.exports = {
     checkPassword,
     checkId,
     checkDeckName,
-    checkSubject
+    checkSubject,
+    checkCard
 }
