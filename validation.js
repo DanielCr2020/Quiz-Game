@@ -17,7 +17,7 @@ function checkPassword(password,notCreating){       //2nd parameter differentiat
     if(!password) throw new Error("Password must be defined")
     if(typeof password!=='string') throw new Error("Password must be a string")
     password=password.trim(); password=xss(password);
-    if(!notCreating) {
+    if(!notCreating) {          //done this way so that users can still log in if password requirements change
         //password criteria
         if(password.length<6) throw "Password must be at least 6 characters long"
         if(password.toLowerCase()===password) throw "Password must include at least one uppercase character"

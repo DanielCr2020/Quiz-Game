@@ -154,8 +154,11 @@ h2.deckSubject.deckSubject {
     width:200%;
     margin-left: 0px;
 }
-.cardFrontInput {
-    font-size: 20px;
+input#cardFrontInput {
+    font-size: 40px;
+}
+textarea#cardBackInput {
+    font-size:30px
 }
 p.create-card-p {
     font-size: 40px;
@@ -166,6 +169,18 @@ p.create-card-p {
     font-weight: bold;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     color:var(--text-blue2);
+}
+.card-front-h1 {
+    text-align: center;
+    font-size: 90px;
+    color: white;
+}
+.card-back-h2 {
+    text-align: center;
+    font-size: 40px;
+}
+p.align-left {
+    text-align: left;
 }
 /*errors*/
 .error {

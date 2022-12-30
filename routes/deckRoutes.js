@@ -8,7 +8,7 @@ const xss=require('xss')
 //      /yourpage/decks
 router
     .route('/')         
-    .get(async(req,res) => {        //getting a user's decks
+    .get(async(req,res) => {        //      /decks get route.    getting a user's decks
         if(!req.body) res.sendStatus(400)
         let username=undefined; let yourDecks=undefined;
         try{
@@ -19,7 +19,7 @@ router
             console.log(e)
             if(!yourDecks) res.status(500).send("Internal Server Error (GET /yourpage/decks)")
             return
-        }
+        }       //since it's getting, we can render
         res.render(path.resolve('views/decks-pages/decks.handlebars'),{title:username,deck:yourDecks,userName:username})
     })
     .post(async(req,res) => {      //      /decks post route (when you make a new deck)
@@ -44,7 +44,7 @@ router
         try{
             yourDecks=await users.getUsersDecks(username)
             newDeck=await decks.createDeck(username,name,subject,false)
-            newDeckId=validation.checkId(newDeck._id.toString())
+            newDeckId=validation.checkId(newDeck._id.toString())        //checks the new deck id
         }
         catch(e){
             console.log(e)
@@ -119,7 +119,7 @@ router
         res.json({
             title:front,
             id:deckId,
-            number:newCard.number,
+            number:newCard.number,      //cards each have a number, which is used for indexing and the url.
             front:front,
             back:back,
             success:true
@@ -133,7 +133,7 @@ router
             deckId=validation.checkId(req.params.id)
             username=validation.checkUsername(req.session.user.username)
             deckToEdit=await decks.getDeckById(username,deckId)
-            if(newDeckName) {
+            if(newDeckName) {           //this style allows for only part of the form to be filled out and have it still work.
                 newDeckName=validation.checkDeckName(newDeckName);
             }
             else{
@@ -189,4 +189,89 @@ router
         })
     })
 
+router
+    .route('/:id/:cardNumber')
+    .get(async(req,res) => {     //  /yourpage/decks/:id/:cardNumber     get route.  Seeing a card
+        if(!req.body) {res.sendStatus(400); return;}
+        let username=undefined; let cards=undefined; let deckId=req.params.id;
+        try{
+            username=validation.checkUsername(req.session.user.username)
+            deckId=validation.checkId(deckId);
+            card=await decks.getCard(username,deckId,req.params.cardNumber)
+            deck=await decks.getDeckById(username,deckId)
+            cards=deck.cards
+        }
+        catch(e){
+            console.log(e)
+            if(!cards) res.status(500).send("Internal Server Error (GET /yourpage/decks/:id/:cardNumber)")
+            return
+        }
+        res.render(path.resolve('views/cards-pages/card.handlebars'),{
+            title:card.front,
+            cardFront:card.front,
+            cardBack:card.back,
+            cardNumber:card.number,
+            id:deckId,
+            deckName:deck.name
+        })
+    })
+    .patch(async(req,res) => {      //      /yourpage/decks/:id/:cardNumber     patch route. Updating a card
+        if(!req.body) {res.sendStatus(400); return;}
+        let deckId=undefined; let front=req.body.front; let back=req.body.back; let username=undefined;
+        let deck=undefined; let isFrontSame=false;
+        try{
+            deckId=validation.checkId(req.params.id)
+            username=validation.checkUsername(req.session.user.username)
+            deck=await decks.getDeckById(username,deckId)
+            if(front) front=validation.checkCard(req.body.front,'front')
+            else {
+                front=deck.cards[req.params.cardNumber].front;
+                isFrontSame=true        //so it won't throw an error if you don't rename the front
+            }
+            if(back) back=validation.checkCard(req.body.back,'back')
+            else back=deck.cards[req.params.cardNumber].back
+            await decks.editCard(username,deckId,Number.parseInt(req.params.cardNumber),front,back,isFrontSame)
+        }
+        catch(e){
+            console.log(e)
+            res.json({
+                title:front,
+                cardFront:front,
+                cardBack:back,
+                id:deckId,
+                errorMessage:e,
+                deckName:deck.name,
+                success:false
+            })
+            return
+        }
+        res.json({
+            title:front,
+            cardFront:front,
+            cardBack:back,
+            id:deckId,
+            deckName:deck.name,
+            success:true
+        })
+    })
+    .delete(async(req,res) => {     //      /yourpage/decks/:id/:cardNumber     delete route. Deleting a card
+        if(!req.body) {res.sendStatus(400); return;}
+        let deckId=undefined; let username=undefined;
+        try{
+            deckId=validation.checkId(req.params.id)
+            username=validation.checkUsername(req.session.user.username)
+            await decks.deleteCard(username,deckId,Number.parseInt(req.params.cardNumber))
+        }
+        catch(e){
+            console.log(e)
+            res.json({
+                errorMessage:e,
+                success:false
+            })
+            return
+        }
+        res.json({
+            success:true
+        })
+    })
 module.exports=router

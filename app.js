@@ -32,67 +32,83 @@ app.use('/yourpage', (req, res, next) => {     //redirect to home if not authent
       next();
     }
   });
-
-  app.use('/yourpage/decks/:id', async (req,res,next) => {     //if the id in the url does not belong to the user's decks (the deck was made by another user, or the deck is invalid)
+app.use('/yourpage/decks/:id/:cardNumber', async(req,res,next) => {         //cards middleware
     if (!req.session.user) {
-      return res.redirect('/')
-    }
-    let id=req.params.id
-    let username=req.session.user.username
+        return res.redirect('/')
+    } 
+    let doesOwn=undefined; let id=undefined; let username=undefined;
     try{
-      id=validation.checkId(id)
-      username=validation.checkUsername(username)
+        id=validation.checkId(req.params.id)
+        username=validation.checkUsername(req.session.user.username)
+        doesOwn=await decks.getDeckById(username,id)   //if getDeckById for a username throws, the user does not have that deck
     }
     catch(e){
-      console.log(e)
-    }
-    if(!res.ignore) {   
-      try{
-        doesOwn=await decks.getDeckById(username,id)
-      }
-      catch(e){
-        console.log("You do not own that deck")
+        console.log("You don't own that deck")
         return res.redirect('/yourpage/decks')
-      }
-      next()
+    }
+    res.ignore=true
+    next()
+})
+app.use('/yourpage/decks/:id', async (req,res,next) => {     //if the id in the url does not belong to the user's decks (the deck was made by another user, or the deck is invalid)
+    if (!req.session.user) {
+        return res.redirect('/')
+    }
+    if(!res.ignore) {   //used for when we are at a card route. If we are, we have already verified ownership. We need to therefore ignore to avoid issues.
+        let id=req.params.id
+        let username=req.session.user.username
+        try{
+            id=validation.checkId(id)
+            username=validation.checkUsername(username)
+        }
+        catch(e){
+            console.log(e)
+        }
+        try{
+            doesOwn=await decks.getDeckById(username,id)    //if getDeckById for a username throws, the user does not have that deck
+        }
+        catch(e){
+            console.log("You do not own that deck")
+            return res.redirect('/yourpage/decks')
+        }
+        next()
     }
     else{
-      next()
+        next()
     }
-  })
-  app.use('/login', (req, res, next) => {
-      if (req.session.user) {
+})
+app.use('/login', (req, res, next) => {
+    if (req.session.user) {
         return res.redirect('/yourpage');
-      } else {
+    } else {
         next();
-      }
-    });
-  app.use('/register', (req, res, next) => {
-      if (req.session.user) {
+    }
+});
+app.use('/register', (req, res, next) => {
+    if (req.session.user) {
         return res.redirect('/yourpage');
-      } else {
+    } else {
         next();
-      }
-    });
-  
-  app.use( async (req,res,next) => {          //logging middleware, runs on every route
-      //log method it is, URL, and if the user is authenticated
-      let start=(new Date().toUTCString()+" "+req.method+" "+req.originalUrl)
-      if(req.session.user){
-          console.log(start+" (Authenticated User)")
-      }
-      else {
-          console.log(start+" (Non authenticated user)")
-      }
-      next()
-  })
-  
-  configRoutes(app);
-  const main=async() => {
-      const db = await connection.dbConnection();
-  }
-  
-  app.listen(3000, () => {
-      console.log("Your routes are running on http://localhost:3000");
-  })
-  main()
+    }
+});
+
+app.use( async (req,res,next) => {          //logging middleware, runs on every route
+    //log method it is, URL, and if the user is authenticated
+    let start=(new Date().toUTCString()+" "+req.method+" "+req.originalUrl)
+    if(req.session.user){
+        console.log(start+" (Authenticated User)")
+    }
+    else {
+        console.log(start+" (Non authenticated user)")
+    }
+    next()
+})
+
+configRoutes(app);
+const main=async() => {
+    const db = await connection.dbConnection();
+}
+
+app.listen(3000, () => {
+    console.log("Your routes are running on http://localhost:3000");
+})
+main()

@@ -37,7 +37,7 @@ const createDeck = async (creator,deckName,subject,isPublic,cardsArray,dateCreat
     }
     const insertDeck=await userCollection.updateOne(
         {username: creator},
-        {$push: {"decks": newDeck}}
+        {$push: {"decks": newDeck}}     //push newDeck to decks
     )
     if(insertDeck.modifiedCount===0) throw "Could not successfully create deck"
     return newDeck
@@ -57,7 +57,7 @@ const deleteDeck = async(creator,deckId) => {
     const userCollection=await users()
     const userFromDeck = await userCollection.updateOne(
         {username:creator},
-        {$pull: {"decks": {"_id": deckId}}}         //      in "decks [array]", find the single deck with the "_id" that matches deckId, and pull that  
+        {$pull: {"decks": {"_id": deckId}}}         //in "decks [array]", find the single deck with the "_id" that matches deckId, and pull that  
     )
     return userFromDeck
 }
@@ -91,10 +91,17 @@ const editDeck = async(username,deckId,newName,newSubject,newPublicity) => {
     const editedDeck=await userCollection.updateOne(            //updating deck
         {username:username,"decks._id":deckId.toString()},
         {$set: {"decks.$.name":newName, "decks.$.subject":newSubject, "decks.$.public":newPublicity}}   //updates specific fields
-    )
+    )               //if nothing is submitted, then nothing is modified.
     if(editedDeck.modifiedCount===0 && !(oldDeck.name.toLowerCase()===newName.toLowerCase() && oldDeck.subject.toLowerCase()===newSubject.toLowerCase() && oldDeck.public===newPublicity)) 
         throw "Could not successfully update deck"
     return await getDeckById(username,deckId);
+}
+
+const getCard=async(username,deckId,cardNumber) => {
+    username=validation.checkUsername(username),
+    deckId=validation.checkId(deckId)
+    const userDeck=await getDeckById(username,deckId)
+    return userDeck.cards[cardNumber]           //user.decks._id.cards
 }
 
 const createCard = async(username,deckId,cardFront,cardBack) => {
@@ -104,7 +111,7 @@ const createCard = async(username,deckId,cardFront,cardBack) => {
     cardBack=validation.checkCard(cardBack,"back")
     const userCollection=await users();
     const userDeck=await getDeckById(username,deckId)
-    for(card of userDeck.cards){
+    for(card of userDeck.cards){                //if they already have that card
         if(card.front.toLowerCase()===cardFront.toLowerCase())
             throw `You already have a card named ${cardFront}`
     }
@@ -113,12 +120,56 @@ const createCard = async(username,deckId,cardFront,cardBack) => {
         front:cardFront,
         back:cardBack
     }
-    const insertCard=await userCollection.updateOne(
+    const insertCard=await userCollection.updateOne(        //pushes to a sub-sub-document
         {username:username,"decks._id":deckId},
-        {$push: {"decks.$.cards":newCard}}
+        {$push: {"decks.$.cards":newCard}}      //push newCard to decks._id.cards
     )
     if(insertCard.modifiedCount===0) throw "Could not successfully create card"
     return newCard
+}
+
+const editCard = async(username,deckId,cardNumber,cardFront,cardBack,isFrontSame) => {
+    username=validation.checkUsername(username)
+    deckId=validation.checkId(deckId)
+    if(cardFront) cardFront=validation.checkCard(cardFront,"front")
+    if(cardBack) cardBack=validation.checkCard(cardBack,"back")
+    const userCollection=await users();
+    const userDeck=await getDeckById(username,deckId)
+    if(!isFrontSame)            //If no new front is specified, the old one is used. In that case, we ignore checking for that name's appearance, since it's already there (from not being changed)
+    for(card of userDeck.cards){                //if they already have that card
+        if(card.front.toLowerCase()===cardFront.toLowerCase())
+            throw `You already have a card named ${cardFront}`
+    }
+    const editedCard=await userCollection.updateOne(                       
+        {"decks._id":deckId,"decks.cards.number":cardNumber},              //filter to specific card
+        {$set:{"decks.$[deck].cards.$[card].front":cardFront,              //update front
+               "decks.$[deck].cards.$[card].back" :cardBack}},             //update back
+        {"arrayFilters":[{"deck._id":deckId},{"card.number":cardNumber}]}  //specify what each $[thing] means. the "." after are fields in those elements
+    )
+    if(editedCard.modifiedCount===0)    
+        throw "Could not successfully update card"
+    return editedCard
+}
+
+const deleteCard = async(username,deckId,cardNumber) => {           
+    username=validation.checkUsername(username)
+    deckId=validation.checkId(deckId)
+    const userCollection=await users();
+    const updatedDeck=await userCollection.updateOne(           //pulls card (there is now a "hole" in the numbers)
+        {username:username,"decks._id":deckId,"decks.cards.number":cardNumber},     //filters down to specific card
+        {$pull: {"decks.$.cards": {"number": cardNumber}}}      //reaches deep into document and pulls out card
+    )
+    if(updatedDeck.modifiedCount===0) throw "Could not delete card"
+    const updatedCardNumbers=await userCollection.updateMany(           //fixes the hole
+        {"decks._id":deckId},           //filters by deck id
+        {"$inc":{"decks.$[].cards.$[card].number":-1}},     //In the decks array, find the deck by Id, then find card by card number, but
+        {"arrayFilters":[{"card.number":{"$gt":cardNumber}}]}       //only use specific elements in array that fit $gt: cardNumber
+    )
+    const deckCheck=await getDeckById(username,deckId)
+                                                        //if we delete the last one, then no numbers are changed
+    if(updatedCardNumbers.modifiedCount===0 && deckCheck.cards && cardNumber!==deckCheck.cards.length) 
+        throw "Could not update card numbers"
+    return updatedCardNumbers
 }
 
 module.exports = {
@@ -127,5 +178,8 @@ module.exports = {
     deleteDeck,
     getDeckById,
     editDeck,
-    createCard
+    getCard,
+    createCard,
+    editCard,
+    deleteCard
 }
