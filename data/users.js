@@ -46,6 +46,14 @@ const getUsersDecks = async(username) => {
     return userDeckList.decks
 }
 
+const getUsersFolders = async(username) => {
+    username=validation.checkUsername(username)
+    const userCollection=await users();
+    const userFolderList=await userCollection.findOne({username:username.toLowerCase()})
+    if(!userFolderList) throw new Error(`Cannot get ${username}'s folders`)
+    return userFolderList.folders
+}
+
 const getAllUsers = async()=>{
     const userCollection=await users()
     let userList=await userCollection.find({}).toArray()
@@ -60,5 +68,6 @@ module.exports = {
     createUser,
     checkUser,
     getUsersDecks,
+    getUsersFolders,
     getAllUsers
 }

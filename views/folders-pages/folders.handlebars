@@ -1,0 +1,23 @@
+<main>
+    <header class="title">{{userName}}'s Folders</header>
+    <div id="error" class="error" hidden>{{errorMessage}}</div>
+    <div class="deck-page-content">
+        <form action="/yourpage/folders" method="POST" id="create-folder-form" class="create-deck-form">
+            <label for="foldernameInput">Folder name:</label>
+            <input id="foldernameInput" type="text" name="foldernameInput"><br>
+            <button type="submit" class="submit-button">Create Folder</button>
+        </form>
+        <div class="deck-page-column">
+            <ol id="folder-list" class="deck-list">
+                {{#each folder}}
+                    <li><a href="folders/{{this._id}}">{{this.name}}</li>
+                {{/each}}
+            </ol>
+        </div>
+    </div>
+    <footer>
+        <nav>
+            <a href="/yourpage">Back to your profile</a>
+        </nav>
+    </footer>
+</main>

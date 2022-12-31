@@ -55,11 +55,12 @@ const deleteDeck = async(creator,deckId) => {
     deckId=validation.checkId(deckId)
     creator=validation.checkUsername(creator)
     const userCollection=await users()
-    const userFromDeck = await userCollection.updateOne(
+    const updatedUser = await userCollection.updateOne(
         {username:creator},
         {$pull: {"decks": {"_id": deckId}}}         //in "decks [array]", find the single deck with the "_id" that matches deckId, and pull that  
     )
-    return userFromDeck
+    if(updatedUser.modifiedCount===0) throw "Could not delete deck"
+    return updatedUser
 }
 
 const getDeckById = async(username,deckId) => {

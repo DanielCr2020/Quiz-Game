@@ -1,18 +1,21 @@
 <main>
     <header><br>Created on: {{dateCreated}}</header>
-    <h1 id="deckName" class="deckName">{{deckName}}</h1>
-    <h2 id="deckSubject" class="deckSubject">{{deckSubject}}</h2> <br>
-    <div id="error2" class="error" hidden>{{errorMessage}}</div>
-    <div class="card-page-content">
-        <p class="create-card-p">Create a card</p>
+    <div class="cards-div">
+        <div class="deck-labels">
+            <h1 id="deckName" class="deckName">{{deckName}}</h1>
+            <h2 id="deckSubject" class="deckSubject">{{deckSubject}}</h2>
+        </div>
         <form action="/yourpage/decks/{{id}}" method="POST" id="create-card-form" class="create-card-form">
+            <p class="create-card-p">Create a card</p><br>
+        <div id="error2" class="error" hidden>{{errorMessage}}</div>
             <label for="cardFrontInput">Front</label>
             <input id="cardFrontInput" type="text" name="cardFrontInput" class="cardFrontInput"><br>
             <label for="cardBackInput">Back</label>
-            <textarea id="cardBackInput" rows="4" cols="38"></textarea> <br>
+            <textarea id="cardBackInput" rows="4" cols="28"></textarea> <br>
             <button type="submit">Add card</button>
-        </form> <br><br>
-        <div class="deck-page-column">
+            </form>
+        <div class="card-page-column">
+        <p class="left-align">Cards</p>
             <ol id="deck-list" class="card-list">
                 {{#each card}}
                     <li><a href="{{../id}}/{{this.number}}"> {{this.front}} ||| {{this.back}}</a></li>
@@ -20,7 +23,6 @@
             </ol>
         </div>
     </div>
-
     <div id="error" class="error" hidden>{{errorMessage}}</div>
     <form action="/yourpage/decks/{{id}}" id="edit-deck-form" class="create-deck-form">
         <label for="decknameInput">Enter new deck name</label> <br>
@@ -35,13 +37,11 @@
         {{/if}}
         <br><button type="submit">Update deck</button>
     </form>
-    <div id="error2" class="error" hidden>{{errorMessage}}</div>
+    <div class="error" hidden>{{errorMessage}}</div>
     <footer>
-        <nav>
-            <div class="align-right">
-                <button type="submit" class="delete-deck" id="delete-deck">Delete this deck</button>
-            </div>
+        <nav class="bottom-row">
             <a href="/yourpage/decks">Back to your decks</a>
+            <button type="submit" class="delete-deck" id="delete-deck">Delete this deck</button>
         </nav>
     </footer>
 </main>

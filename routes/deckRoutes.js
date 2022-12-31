@@ -25,23 +25,11 @@ router
     .post(async(req,res) => {      //      /decks post route (when you make a new deck)
         if(!req.body) {res.sendStatus(400); return;}
         let name=undefined; let subject=undefined; let username=undefined;
-        try{        //initial validation
+        let newDeck=undefined; let yourDecks=undefined; let newDeckId=undefined;     //creating deck
+        try{
             name=validation.checkDeckName(req.body.name);
             subject=validation.checkSubject(req.body.subject);
             username=validation.checkUsername(req.session.user.username);
-        }
-        catch(e){
-            console.log(e)
-            res.json({
-                title:"Cannot create deck",
-                success:false,
-                error:e.toString()
-            })
-            res.status(400)
-            return
-        }
-        let newDeck=undefined; let yourDecks=undefined; let newDeckId=undefined;     //creating deck
-        try{
             yourDecks=await users.getUsersDecks(username)
             newDeck=await decks.createDeck(username,name,subject,false)
             newDeckId=validation.checkId(newDeck._id.toString())        //checks the new deck id
@@ -52,18 +40,16 @@ router
                 title:"Cannot create deck",
                 deck:yourDecks,
                 success:false,
-                error:e
+                error:e.toString()
             })
             res.status(400)
             return
         }
         //was able to create deck
-        name=newDeck.name
-        subject=newDeck.subject
         res.json({
             title:username,
-            subject:subject,
-            newName:name,
+            subject:newDeck.subject,
+            newName:newDeck.name,
             deck:yourDecks,
             id:newDeckId,
             userName:username,

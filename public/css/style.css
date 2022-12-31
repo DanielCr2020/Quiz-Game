@@ -2,6 +2,12 @@
     --bg-gray: rgb(10,15,20);
     --text-blue: rgb(100,155,255);
     --text-blue2: rgb(30,120,255);
+    --header-color: rgb(0,25,65);
+    --gray-100: rgb(100,100,100);
+    --link-color:rgb(0,70,170);
+    --h2-color:rgb(100,255,200);
+    --button-hover-color:rgb(0,65,165);
+    --button-active-color:rgb(0,150,90);
 }
 /*General*/
 html, body {
@@ -13,12 +19,34 @@ label {
     font-size: 30px;
 }
 header {
-    background-color: rgb(0,25,65);
+    background-color: rgba(0,50,150,0.5);
     color:white;
     font-size: 32px;
+    border-radius: 8px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 1px 12px rgba(0,0,0,0.25);
+    border: 1px solid rgba(0,50,150,0.5);
 }
 footer {
     font-size: 32px;
+}
+input {
+    background-color: var(--gray-100);
+    border-color: black;
+    
+}
+textarea {
+    background-color: var(--gray-100);
+    border-color: black;
+}
+div.right-align{
+    text-align: right;
+}
+div.left-align{
+    text-align: left;
+}
+div.spacer {
+    margin: 0% 35%;
 }
 .error-center {
     font-size: 30px;
@@ -28,12 +56,33 @@ footer {
 p {
     color:green;
     text-align: center;
-    font-size: 24px;
+    font-size: 32px;
+    margin:4px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+p.left-align {
+    text-align: left;
+    margin-left: 20px;
 }
 h2 {
     text-align: center;
-    color:rgb(200,255,200);
+    color:var(--h2-color);
     font-size: 36px;
+}
+button {
+    background-color: black;
+    color:white;
+    border-color: white;
+    border-radius: 12px;
+}
+button:hover {
+    background-color: var(--button-hover-color);
+    border-color:white;
+    transition: 0.15s;
+}
+button:active {
+    background-color:var(--button-active-color);
+    transition: 0s;
 }
 /*Login form*/
 .login-form {
@@ -77,9 +126,12 @@ header.title {
 .align-right  {
     text-align: right;
 }
-/*a {
-    font-size: 24px;
-}*/
+a {
+    color:var(--link-color);
+}
+a:hover {
+    color:white;
+}
 a.home {
     font-size: 28px;
 }
@@ -99,6 +151,7 @@ a.home {
 .view-decks {
     text-align: center;
     font-size: 50px;
+    background-color:rgb(0,15,30);
 }
 .deck-list {
     font-size: 36px;
@@ -120,7 +173,7 @@ a.home {
     display:flex;
     flex-direction: column;
     justify-content: center;
-    width:200%;
+    width:50%;
     margin-left: 60px;
 }
 /*Single deck*/
@@ -135,37 +188,54 @@ h2.deckSubject.deckSubject {
     font-size: 40px;
     text-align: left;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    margin: 0px 0px;
 }
-
-.card-page-content {
+div.deck-labels {
+    width:30%;
+    word-wrap: break-word;
+    height:150%
+}
+div.card-page-content {
     display:flex;
     color:white;
     font-size: 36px;
     flex-direction: row;
-    justify-content: right;
-    width:80%;
+    justify-content: left;
+    width:95%;
     margin-left: 30px;
+    position:static;
+    bottom:0;
+    right:0;
+}
+div.cards-div {
+    display:flex;
+    flex-direction: row;
+    justify-content: left;
+    
+}
+nav.bottom-row {
+    display: flex;
+    justify-content: space-between;
 }
 .card-page-column {
     display:flex;
     flex-direction: column;
     justify-content: center;
-    width:200%;
+    width:100%;
     margin-left: 0px;
+    color:white;
+    font-size: 32px;
 }
 input#cardFrontInput {
-    font-size: 40px;
+    font-size: 30px;
 }
 textarea#cardBackInput {
-    font-size:30px
+    font-size:24px
 }
 p.create-card-p {
     font-size: 40px;
     text-align: left;
-    margin-right:10px;
-    margin-left: 0px;
-    width:120%;
+    margin-right:0px 0px;
+    width:100%;
     font-weight: bold;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     color:var(--text-blue2);

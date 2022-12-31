@@ -143,4 +143,28 @@
             }
         })
     })
+    //for creating a folder
+    $('#create-folder-form').submit(function (event) {
+        event.preventDefault();
+        let fni=$('#foldernameInput').val().trim();
+        if(fni){
+            let requestConfig = {
+                method:"POST",
+                data:{name:fni}
+            }
+            $.ajax(requestConfig).then(function (responseMessage) {
+                if(responseMessage.success){
+                    errorDiv.hidden=true
+                    let listItem=`<li><a href="folders/${responseMessage.id}">${responseMessage.name}</a></li>`
+                    $('#folder-list').append(listItem)
+                }
+                else{
+                    errorDiv.hidden=false
+                    errorDiv.innerText=responseMessage.error     //error message thrown from routes (checking) is used here
+                    $('#foldernameInput').focus();
+                }
+                $('#create-folder-form').trigger('reset')
+            })
+        }
+    })
 })(window.jQuery)
