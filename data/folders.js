@@ -70,9 +70,10 @@ const getFolderById=async(username,folderId) => {
         {username:username,
          folders:{$elemMatch:{_id:folderId}}},
         {projection:{"folders.$":1}}
-    ).folders[0]
-    if(!folderFromId) throw "Unable to find that folder"
-    return folderFromId
+    )
+    const folderFound=folderFromId.folders[0]
+    if(!folderFound) throw "Unable to find that folder"
+    return folderFound
 }
 
 const addDeckToFolder=async(username,folderId,deckId) => {

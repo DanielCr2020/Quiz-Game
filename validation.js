@@ -67,7 +67,7 @@ function checkCard(contents,forb){      //it's forbin time
 }
 
 function checkFolderName(folderName){
-    if(!folderName) throw new Error("Folder is not defined")
+    if(!folderName) throw new Error("Folder name is not defined")
     if(typeof folderName!=='string') throw new Error("Folder name is not a string")
     folderName=xss(folderName.trim())
     if(folderName.length<2) throw "Folder name must be at least 2 characters"

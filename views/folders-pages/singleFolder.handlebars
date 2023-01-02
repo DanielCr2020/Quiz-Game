@@ -1,0 +1,20 @@
+<main>
+    <h1 id="folderName" class="deckName">{{folderName}}</h1>
+    <ol id="deck-list" class="deck-list">
+        {{#each deck}}
+            <li><a href="/yourpage/decks/{{this._id}}">{{this.name}}</a></li>
+        {{/each}}
+    </ol>
+    <p id="error" class="error" hidden>{{errorMessage}}</p>
+    <form action="/yourpage/folders/{{id}}" id="edit-folder-form" class="edit-deck-form">
+        <label for="foldernameInput">Enter new folder name</label>
+        <input id="foldernameInput" type="text" name="foldernameInput" class="foldernameInput"> <br>
+        <button type="submit">Rename folder</button>
+    </form> 
+    <footer>
+        <nav class="bottom-row">
+            <a href="/yourpage/folders">Back to your folders</a>
+            <button type="submit" class="delete-deck" id="delete-folder">Delete this folder</button>
+        </nav>
+    </footer>
+</main>

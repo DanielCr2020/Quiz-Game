@@ -7,7 +7,7 @@
         </div>
         <form action="/yourpage/decks/{{id}}" method="POST" id="create-card-form" class="create-card-form">
             <p class="create-card-p">Create a card</p><br>
-        <div id="error2" class="error" hidden>{{errorMessage}}</div>
+        <p id="error2" class="error-p" hidden>{{errorMessage}}</p>
             <label for="cardFrontInput">Front</label>
             <input id="cardFrontInput" type="text" name="cardFrontInput" class="cardFrontInput"><br>
             <label for="cardBackInput">Back</label>
@@ -23,7 +23,7 @@
             </ol>
         </div>
     </div>
-    <div id="error" class="error" hidden>{{errorMessage}}</div>
+    <p id="error" class="error-p" hidden>{{errorMessage}}</p>
     <form action="/yourpage/decks/{{id}}" id="edit-deck-form" class="create-deck-form">
         <label for="decknameInput">Enter new deck name</label> <br>
         <input id="decknameInput" type="text" name="decknameInput"><br>

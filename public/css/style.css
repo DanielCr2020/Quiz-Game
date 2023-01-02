@@ -48,11 +48,6 @@ div.left-align{
 div.spacer {
     margin: 0% 35%;
 }
-.error-center {
-    font-size: 30px;
-    text-align: center;
-    color:red;
-}
 p {
     color:green;
     text-align: center;
@@ -252,8 +247,22 @@ p.create-card-p {
 p.align-left {
     text-align: left;
 }
+/*folders*/
+input#foldernameInput.foldernameInput {
+    font-size: 32px;
+}
 /*errors*/
 .error {
     font-size: 30px;
+    color:red;
+}
+.error-p {
+    font-size: 30px;
+    color:red;
+    text-align: left;
+}
+.error-center {
+    font-size: 30px;
+    text-align: center;
     color:red;
 }

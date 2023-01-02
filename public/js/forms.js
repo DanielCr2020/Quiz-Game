@@ -167,4 +167,44 @@
             })
         }
     })
+    //for editing a folder
+    $('#edit-folder-form').submit(function (event) {
+        event.preventDefault();
+        let folderName=$('#foldernameInput').val().trim()
+        let requestConfig={
+            method:"PATCH",
+            data:{newFolderName:folderName}
+        }
+        $.ajax(requestConfig).then(function (responseMessage) {
+            if(responseMessage.success){
+                errorDiv.hidden=true
+                $('#folderName').replaceWith(`<h1 id="folderName" class="deckName">${responseMessage.folderName}</h1>`)
+            }
+            else{
+                errorDiv.hidden=false
+                errorDiv.innerHTML=responseMessage.errorMessage
+                $('#foldernameInput').focus()
+            }
+            $('#edit-folder-form').trigger('reset')
+        })
+    })
+    //for deleting a folder
+    $('#delete-folder').on('click', function (event) {
+        event.preventDefault();
+        let url=window.location.href.substring(window.location.href.indexOf("/yourpage"));     //gets deck id
+        let id=url.substring(url.indexOf("/folders/")+9)
+        let requestConfig = {
+            method: "DELETE",
+            data:{id:id}
+        }
+        $.ajax(requestConfig).then(function (responseMessage) {
+            if(responseMessage.success){
+                alert("Folder successfully deleted")
+                window.location.href='/yourpage/folders'
+            }
+            else{
+                alert(responseMessage.error)
+            }
+        })
+    })
 })(window.jQuery)
