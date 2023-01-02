@@ -46,7 +46,7 @@ const createDeck = async (creator,deckName,subject,isPublic,cardsArray,dateCreat
 const getUsersDecks = async(username) => {
     username=validation.checkUsername(username)
     const userCollection=await users();
-    const user=userCollection.findOne({username:username})
+    const user=await userCollection.findOne({username:username})
     if(!user) throw "Could not get user"
     return user.decks
 }
@@ -60,6 +60,11 @@ const deleteDeck = async(creator,deckId) => {
         {$pull: {"decks": {"_id": deckId}}}         //in "decks [array]", find the single deck with the "_id" that matches deckId, and pull that  
     )
     if(updatedUser.modifiedCount===0) throw "Could not delete deck"
+    const updatedFolders=await userCollection.updateMany(       //remove the deck id from any folders
+        {username:creator},
+        {$pull: {"folders.$[].decks":deckId}}
+    )
+    if(updatedFolders.modifiedCount===0) throw "Could not remove deck from folders"
     return updatedUser
 }
 
@@ -67,14 +72,25 @@ const getDeckById = async(username,deckId) => {
     deckId=validation.checkId(deckId)
     username=validation.checkUsername(username)
     const userCollection=await users()
-    const deckFoundUser=await userCollection.findOne(
+    const deckFound=await userCollection.findOne(
         {username:username,                     //finds user 
          decks:{$elemMatch: {_id:deckId}}},     //then finds the deck that elemMatches the deckId
         {projection: {"decks.$":1}}             //empty projection on the first one(?????)
     )
-    const deckFound=deckFoundUser.decks[0]
-    if(!deckFound) throw new Error("Unable to find that deck")
-    return deckFound
+    if(!deckFound) throw ("Unable to find that deck")
+    return deckFound.decks[0]
+}
+
+const getDeckByName = async(username,deckName) => {
+    username=validation.checkUsername(username)
+    deckName=validation.checkDeckName(deckName)
+    const userCollection=await users()
+    const deckFound=await userCollection.findOne(
+        {username:username,decks:{$elemMatch: {name:deckName}}},
+        {projection: {"decks.$":1}}
+    )
+    if(!deckFound) throw ("Unable to find that deck")
+    return deckFound.decks[0]
 }
 
 const editDeck = async(username,deckId,newName,newSubject,newPublicity) => {
@@ -178,6 +194,7 @@ module.exports = {
     getUsersDecks,
     deleteDeck,
     getDeckById,
+    getDeckByName,
     editDeck,
     getCard,
     createCard,

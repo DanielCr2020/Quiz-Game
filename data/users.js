@@ -4,7 +4,6 @@ const mongoCollections = require('../config/mongoCollections');
 const users = mongoCollections.users
 const validation=require('../validation')
 const {ObjectId} = require('mongodb');
-const xss=require('xss')
 
 const createUser = async(username,password) => {        //when a user registers
     username=validation.checkUsername(username)

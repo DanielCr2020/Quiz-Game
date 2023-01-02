@@ -49,8 +49,8 @@ router
         let check=false
         let username=false; let password=false;
         try{
-            username=validation.checkUsername(req.body.usernameInput)
-            password=validation.checkPassword(req.body.passwordInput)
+            username=validation.checkUsername(req.body.usernameInput,false)
+            password=validation.checkPassword(req.body.passwordInput,true)
             check=await users.checkUser(username,password)
         }
         catch(e){     //if the user puts in bad data

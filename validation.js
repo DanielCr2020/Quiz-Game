@@ -5,11 +5,13 @@ const maxLen=40
 const maxFront=50
 const maxBack=200
 
-function checkUsername(username){
+function checkUsername(username,notCreating){
     if(!username) throw new Error("Username must be defined")
     if(typeof username!=='string') throw new Error("Username must be a string")
     username=username.trim().toLowerCase(); username=xss(username);
-    if(username.length<4) throw new Error("Username must be at leats 4 characters long")
+    if(notCreating) { //done this way so that users can still log in if username requirements change
+        if(username.length<4) throw new Error("Username must be at least 4 characters long")
+    }
     return username
 }
 

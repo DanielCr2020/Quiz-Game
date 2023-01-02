@@ -1,11 +1,37 @@
 <main>
+    <header><br>Created on: {{dateCreated}}</header>
     <h1 id="folderName" class="deckName">{{folderName}}</h1>
     <ol id="deck-list" class="deck-list">
-        {{#each deck}}
-            <li><a href="/yourpage/decks/{{this._id}}">{{this.name}}</a></li>
+        {{#each deckInFolder}}
+            <li><a href="/yourpage/decks/{{this._id}}">{{this.name}}</a> - Subject: {{this.subject}}</li>
         {{/each}}
     </ol>
-    <p id="error" class="error" hidden>{{errorMessage}}</p>
+    <!-- add deck to folder -->
+    <p id="error2" class="error-p" hidden>{{error}}</p>
+    <form action="/yourpage/folders/{{id}}" method="POST" id="add-deck-to-folder" class="add-deck-to-folder">
+        <label for="addDeck">Add deck to folder:</label>
+        <select name="addDeck" id="addDeck">
+                <option>&lt;select deck&gt;</option>
+            {{#each deck}}
+                <option value="{{this.name}}">{{this.name}}</option>
+            {{/each}}
+        </select><br>
+        <button type="submit" class="submit-button" id="submit-button">Add deck</button>
+    </form><br>
+    <!-- remove deck from folder -->
+    <p id="error3" class="error-p" hidden>{{error}}</p>
+    <form action="/yourpage/folders/{{id}}" method="DELETE" id="remove-deck-from-folder" class="add-deck-to-folder">
+        <label for="removeDeck">Remove deck from folder:</label>
+        <select name="removeDeck" id="removeDeck">
+                <option>&lt;select deck&gt;</option>
+            {{#each deck}}
+                <option value="{{this.name}}">{{this.name}}</option>
+            {{/each}}
+        </select><br>
+        <button type="submit" class="submit-button" id="submit-button">Remove deck</button>
+    </form><br>
+
+    <p id="error" class="error-p" hidden>{{errorMessage}}</p>
     <form action="/yourpage/folders/{{id}}" id="edit-folder-form" class="edit-deck-form">
         <label for="foldernameInput">Enter new folder name</label>
         <input id="foldernameInput" type="text" name="foldernameInput" class="foldernameInput"> <br>

@@ -81,6 +81,8 @@ const addDeckToFolder=async(username,folderId,deckId) => {
     folderId=validation.checkId(folderId)
     deckId=validation.checkId(deckId)
     const userCollection=await users()
+    let folder=await getFolderById(username,folderId)
+    if(folder.decks.includes(deckId)) throw "That deck is already in that folder"
     const updatedFolder=await userCollection.updateOne(
         {username:username,"folders._id":folderId},
         {$push: {"folders.$.decks":deckId}}
@@ -93,7 +95,9 @@ const removeDeckFromFolder=async(username,folderId,deckId) => {
     username=validation.checkUsername(username)
     folderId=validation.checkId(folderId)
     deckId=validation.checkId(deckId)
-    const userCollection=await users()
+    const userCollection=await users()      
+    const existingDecks=(await getFolderById(username,folderId)).decks      //those parentheses need to be there
+    if(!existingDecks.find(id => id===deckId)) throw "That deck is not in that folder"
     const updatedFolder=await userCollection.updateOne(
         {username:username,"folders._id":folderId},
         {$pull: {"folders.$.decks":deckId}}

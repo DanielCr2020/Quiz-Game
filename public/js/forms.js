@@ -2,6 +2,7 @@
     //errors
     let errorDiv=document.getElementById('error')
     let errorDiv2=document.getElementById('error2')
+    let errorDiv3=document.getElementById('error3')
 
     //for creating a deck
     $('#create-deck-form').submit(function (event) {
@@ -206,5 +207,50 @@
                 alert(responseMessage.error)
             }
         })
+    })
+    //for adding a deck to a folder
+    $('#add-deck-to-folder').submit(function (event) {
+        event.preventDefault();
+        let deckToAdd=$('#addDeck').val()
+        if(deckToAdd && deckToAdd!=="<select deck>"){
+            let requestConfig={
+                method:"POST",
+                data:{deckToAddName:deckToAdd}
+            }
+            $.ajax(requestConfig).then(function (responseMessage) {
+                if(responseMessage.success){
+                    errorDiv2.hidden=true
+                    let listItem=`<li><a href="/yourpage/decks/${responseMessage.id}">${responseMessage.deckName}</a> - Subject: ${responseMessage.subject}</li>`
+                    $('#deck-list').append(listItem)
+                }
+                else{
+                    errorDiv2.hidden=false
+                    errorDiv2.innerText=responseMessage.error     //error message thrown from routes (checking) is used here 
+                }
+                $("#add-deck-to-folder").trigger('reset')
+            })
+        }
+    })
+    //for removing a deck from a folder
+    $('#remove-deck-from-folder').submit(function (event) {
+        event.preventDefault();
+        let deckToRemove=$('#removeDeck').val()
+        if(deckToRemove && deckToRemove!=="<select deck>"){
+            let requestConfig={
+                method:"DELETE",
+                data:({deckToRemoveName:deckToRemove,removeDeck:true,deckList:$("#deck-list")[0].innerHTML})
+            }
+            $.ajax(requestConfig).then(function (responseMessage) {
+                if(responseMessage.success){
+                    errorDiv3.hidden=true
+                    $("#deck-list")[0].innerHTML=responseMessage.newDeckList        //replaces html with one that removed the deck
+                }
+                else{
+                    errorDiv3.hidden=false
+                    errorDiv3.innerText=responseMessage.error     //error message thrown from routes (checking) is used here 
+                }
+                $("#remove-deck-from-folder").trigger('reset')
+            })
+        }
     })
 })(window.jQuery)

@@ -251,6 +251,12 @@ p.align-left {
 input#foldernameInput.foldernameInput {
     font-size: 32px;
 }
+select#addDeck {
+    font-size: 24px;
+}
+select#removeDeck {
+    font-size: 24px;
+}
 /*errors*/
 .error {
     font-size: 30px;
