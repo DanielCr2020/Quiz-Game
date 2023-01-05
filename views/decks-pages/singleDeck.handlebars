@@ -1,5 +1,5 @@
 <main>
-    <header><br>Created on: {{dateCreated}}</header>
+    <header>Created by: {{creator}}<br>on {{dateCreated}}</header>
     <div class="cards-div">
         <div class="deck-labels">
             <h1 id="deckName" class="deckName">{{deckName}}</h1>
@@ -7,13 +7,13 @@
         </div>
         <form action="/yourpage/decks/{{id}}" method="POST" id="create-card-form" class="create-card-form">
             <p class="create-card-p">Create a card</p><br>
-        <p id="error2" class="error-p" hidden>{{errorMessage}}</p>
+            <p id="error2" class="error-p" hidden>{{errorMessage}}</p>
             <label for="cardFrontInput">Front</label>
             <input id="cardFrontInput" type="text" name="cardFrontInput" class="cardFrontInput"><br>
             <label for="cardBackInput">Back</label>
             <textarea id="cardBackInput" rows="4" cols="28"></textarea> <br>
             <button type="submit">Add card</button>
-            </form>
+        </form>
         <div class="card-page-column">
         <p class="left-align">Cards</p>
             <ol id="deck-list" class="card-list">

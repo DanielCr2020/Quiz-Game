@@ -167,6 +167,15 @@ router
                 res.json({success:false,error:e.toString()})
                 return
             }
+            let deckList=req.body.deckList;     //deck list html
+            deckList=deckList.split('<li>')     //splits it to an array based on li
+            let dName=deckToRemove.name;
+            let dSubject=deckToRemove.subject;          //filter out the deck to remove
+            deckList=deckList.filter((deck) => {return !(deck.includes(`">${dName}</a>`) && deck.includes(` - Subject: ${dSubject}`))}).join('<li>')
+            res.json({
+                newDeckList:deckList,
+                success:true
+            })
         }
         else{           //      if we are deleting a folder
             try{
@@ -177,16 +186,8 @@ router
                 res.json({success:false,error:e.toString()})
                 return
             }
+            res.json({success:true})
         }
-        let deckList=req.body.deckList;     //deck list html
-        deckList=deckList.split('<li>')     //splits it to an array based on li
-        let dName=deckToRemove.name;
-        let dSubject=deckToRemove.subject;          //filter out the deck to remove
-        deckList=deckList.filter((deck) => {return !(deck.includes(`">${dName}</a>`) && deck.includes(` - Subject: ${dSubject}`))}).join('<li>')
-        res.json({
-            newDeckList:deckList,
-            success:true
-        })
     })
 
 module.exports=router

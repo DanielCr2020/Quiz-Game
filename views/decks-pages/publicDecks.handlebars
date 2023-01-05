@@ -1,0 +1,15 @@
+<main>
+    <h1 class="public-deck-h1">Public decks</h1>
+    <ol class="deck-list">
+        {{#each publicDeck}}
+            <li><a href="/publicdecks/{{this._id}}">{{this.name}}</a> ||| Subject: {{this.subject}} ||| Creator: {{this.creator}}</li>
+        {{/each}}
+    </ol>
+    {{#if loggedIn}}
+        <footer>
+            <nav class="bottom-row">
+                <a href="/yourpage/decks">Go to your decks</a>
+            </nav>
+        </footer>
+    {{/if}}
+</main>

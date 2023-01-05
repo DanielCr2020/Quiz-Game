@@ -1,0 +1,27 @@
+<main>
+    <div class="cards-div">
+        <div class="deck-labels">
+            <h1 class="deckName">{{publicDeck.name}}</h1>
+            <h2 class="deckSubject">{{publicDeck.subject}}</h2><br>
+            <h3 class="deckInfo">Created by: {{publicDeck.creator}} <br> on {{publicDeck.dateCreated}}</h3>
+        </div>
+        <div class="card-page-column">
+            <p class="left-align">Cards</p>
+            <ol id="deck-list" class="card-list">
+                {{#each publicDeck.cards}}
+                    <li>{{this.front}} ||| {{this.back}}</li>
+                {{/each}}
+            </ol>
+        </div>
+    </div>
+    {{#if loggedIn}}
+        <footer>
+            <p id="error" class="error-p" hidden>{{error}}</p>
+            <nav class="bottom-row">
+                <a href="/publicdecks">Back to public decks</a>
+                <button type="submit" class="submit-button" id="save-deck">Save this deck</button>
+                <a href="/yourpage/decks">Go to your decks</a>
+            </nav>
+        </footer>
+    {{/if}}
+</main>

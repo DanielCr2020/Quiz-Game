@@ -2,6 +2,7 @@ const express=require('express')
 const router=express.Router()
 const path=require('path')
 const users=require('../data/users')
+const decks=require('../data/decks')
 const validation=require('../validation')
 
 router
@@ -85,5 +86,66 @@ router
         if(!req.session.user) res.redirect('/')
         req.session.destroy()
         res.redirect('/')
+    })
+        //public deck routes
+router
+    .route('/publicdecks')
+    .get(async(req,res) => {        //getting public decks (not logged in)
+        let publicDecks=undefined
+        try{
+            publicDecks=await decks.getPublicDecks()
+        }
+        catch(e){
+            console.log(e)
+            res.status(500).send("Internal server error (GET /publicdecks)")
+            return
+        }
+        res.render(path.resolve('views/decks-pages/publicDecks.handlebars'),{
+            title:"Public decks",
+            publicDeck:publicDecks,
+            loggedIn:req.session.user ? true : false
+        })
+    })
+router
+    .route('/publicdecks/:id')
+    .get(async(req,res) => {        //single public deck (not logged in)
+        let publicDecks=undefined; let publicDeck=undefined; let deckId=undefined;
+        try{
+            deckId=validation.checkId(req.params.id)
+            publicDecks=await decks.getPublicDecks()
+            publicDeck=publicDecks.filter((deck) => {return deck._id.toString()===deckId.toString()})[0]
+        }
+        catch(e){
+            console.log(e)
+            res.status(500).send("Internal server error (GET /publicdecks/:id)")
+            return
+        }
+        res.render(path.resolve('views/decks-pages/singlePublicDeck.handlebars'),{
+            title:publicDeck.name+" (public)",
+            publicDeck:publicDeck,
+            loggedIn:req.session.user ? true : false
+        })
+    })
+    .post(async(req,res) => {           //saving a public deck          (only possible when you are logged in)
+        let publicDeck=undefined; let id=undefined; let username=undefined;
+        try{
+            id=validation.checkId(req.params.id)
+            username=validation.checkUsername(req.session.user.username)
+            publicDeck=await decks.getDeckByOnlyId(id)
+            await decks.createDeck(publicDeck.creator,publicDeck.name,publicDeck.subject,false,publicDeck.cards,publicDeck.dateCreated,username)
+            //if(username) username=validation.checkUsername(username)
+        }
+        catch(e){
+            console.log(e)
+            res.json({
+                error:e.toString(),
+                success:false
+            })
+            return
+        }
+        res.json({
+            publicDeckName:publicDeck.name,
+            success:true
+        })
     })
 module.exports = router;

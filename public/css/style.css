@@ -139,7 +139,7 @@ a.home {
     color:var(--text-blue);
 }
 .homepage-actions a:hover {
-    font-size: 90px;
+    font-size: 70px;
     transition: 0.25s;
 }
 /*view decks*/
@@ -256,6 +256,15 @@ select#addDeck {
 }
 select#removeDeck {
     font-size: 24px;
+}
+/*public decks*/
+h1.public-deck-h1 {
+    font-size: 60px;
+    color:white;
+}
+h3.deckInfo {
+    font-size: 32px;
+    color:var(--text-blue);
 }
 /*errors*/
 .error {

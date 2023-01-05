@@ -9,36 +9,46 @@ function fn(str){       //adds leading 0 to 1 digit time numbers
     return str
 }
 
-const createDeck = async (creator,deckName,subject,isPublic,cardsArray,dateCreated) => {
+const createDeck = async (creator,deckName,subject,isPublic,cardsArray,dateCreated,user) => {
     creator=validation.checkUsername(creator)
     deckName=validation.checkDeckName(deckName)
     subject=validation.checkSubject(subject)
-
+    if(user) user=validation.checkUsername(user)
     const userCollection = await users();
-    const deckCreator=await userCollection.findOne({username:creator.toLowerCase()})
+    const deckCreator=await userCollection.findOne({username: user ? user.toLowerCase() : creator.toLowerCase()})
     for(deck of deckCreator.decks){
         if(deck.name.toLowerCase()===deckName.toLowerCase())    //checks if you already have that deck
             throw `You already have a deck called ${deckName}`
     }
     if(Array.isArray(cardsArray)) cards=cardsArray
     else cards=[]
-    if(typeof dateCreated!='undefined'){
-        newDeck.dateCreated=dateCreated
+    if(typeof dateCreated=='undefined'){
+        dateCreated=`${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()} ${fn(d.getHours())}:${fn(d.getMinutes())}:${fn(d.getSeconds())}`
     }
     let d=new Date()
     let newDeck = {
         _id: ObjectId().toString(),
         name:deckName,
         subject:subject,
-        dateCreated: `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()} ${fn(d.getHours())}:${fn(d.getMinutes())}:${fn(d.getSeconds())}`,
+        dateCreated:dateCreated,
         creator:creator,
         public:isPublic,
         cards:cards
     }
-    const insertDeck=await userCollection.updateOne(
-        {username: creator},
-        {$push: {"decks": newDeck}}     //push newDeck to decks
-    )
+    let insertDeck=undefined
+    if(user){       //adds deck to a specific user
+        user=validation.checkUsername(user)
+        insertDeck=await userCollection.updateOne(
+            {username:user},
+            {$push: {"decks":newDeck}}
+        )
+    }
+    else {      //adds deck to creator
+        insertDeck=await userCollection.updateOne(
+            {username:creator},
+            {$push: {"decks": newDeck}}     //push newDeck to decks
+        )
+    }
     if(insertDeck.modifiedCount===0) throw "Could not successfully create deck"
     return newDeck
 }
@@ -64,7 +74,7 @@ const deleteDeck = async(creator,deckId) => {
         {username:creator},
         {$pull: {"folders.$[].decks":deckId}}
     )
-    if(updatedFolders.modifiedCount===0) throw "Could not remove deck from folders"
+    if(updatedFolders.modifiedCount===0 && updatedFolders.matchedCount===0) throw "Could not remove deck from folders"
     return updatedUser
 }
 
@@ -79,6 +89,15 @@ const getDeckById = async(username,deckId) => {
     )
     if(!deckFound) throw ("Unable to find that deck")
     return deckFound.decks[0]
+}
+
+const getDeckByOnlyId=async(deckId) => {            //uses aggregation to get a deck given only the id of a deck
+    deckId=validation.checkId(deckId)
+    const userCollection=await users()
+    const deckFoundCursor=await userCollection.aggregate([{"$unwind":"$decks"},{"$match":{"decks._id":deckId}},{"$replaceRoot":{"newRoot":"$decks"}}])
+    let deckFound=(await deckFoundCursor.toArray())[0]
+    if(!deckFound) throw "Unable to find that deck"
+    return deckFound
 }
 
 const getDeckByName = async(username,deckName) => {
@@ -177,7 +196,7 @@ const deleteCard = async(username,deckId,cardNumber) => {
         {$pull: {"decks.$.cards": {"number": cardNumber}}}      //reaches deep into document and pulls out card
     )
     if(updatedDeck.modifiedCount===0) throw "Could not delete card"
-    const updatedCardNumbers=await userCollection.updateMany(           //fixes the hole
+    const updatedCardNumbers=await userCollection.updateMany(           //fixes the hole. Updates every card number after the one that was removed.
         {"decks._id":deckId},           //filters by deck id
         {"$inc":{"decks.$[].cards.$[card].number":-1}},     //In the decks array, find the deck by Id, then find card by card number, but
         {"arrayFilters":[{"card.number":{"$gt":cardNumber}}]}       //only use specific elements in array that fit $gt: cardNumber
@@ -189,15 +208,28 @@ const deleteCard = async(username,deckId,cardNumber) => {
     return updatedCardNumbers
 }
 
+const getPublicDecks=async() => {
+    const userCollection=await users()
+    const publicDecksCursor=await userCollection.aggregate([        //aggregates public decks
+        {"$unwind":"$decks"},
+        {"$match":{"decks.public":true}},
+        {"$replaceRoot":{"newRoot":"$decks"}}
+    ])
+    const publicDecks=await publicDecksCursor.toArray()
+    return publicDecks
+}
+
 module.exports = {
     createDeck,
     getUsersDecks,
     deleteDeck,
     getDeckById,
+    getDeckByOnlyId,
     getDeckByName,
     editDeck,
     getCard,
     createCard,
     editCard,
-    deleteCard
+    deleteCard,
+    getPublicDecks
 }

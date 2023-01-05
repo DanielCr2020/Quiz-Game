@@ -61,8 +61,7 @@
         let url=window.location.href.substring(window.location.href.indexOf("/yourpage"));     //gets deck id
         let id=url.substring(url.indexOf("/decks/")+7)
         let requestConfig = {
-            method: "DELETE",
-            data:{id:id}
+            method: "DELETE"
         }
         $.ajax(requestConfig).then(function (responseMessage) {
             if(responseMessage.success){
@@ -195,8 +194,7 @@
         let url=window.location.href.substring(window.location.href.indexOf("/yourpage"));     //gets deck id
         let id=url.substring(url.indexOf("/folders/")+9)
         let requestConfig = {
-            method: "DELETE",
-            data:{id:id}
+            method: "DELETE"
         }
         $.ajax(requestConfig).then(function (responseMessage) {
             if(responseMessage.success){
@@ -252,5 +250,24 @@
                 $("#remove-deck-from-folder").trigger('reset')
             })
         }
+    })
+    //for saving a public deck
+    $("#save-deck").on('click', function (event) {
+        event.preventDefault()
+        //let id=window.location.href.substring(window.location.href.indexOf('/publicdecks/')+13)     //gets deck id
+        let requestConfig = {
+            method:"POST"
+        }
+        $.ajax(requestConfig).then(function (responseMessage) {
+            if(responseMessage.success){
+                errorDiv.hidden=true
+                alert(`Public deck ${responseMessage.publicDeckName} was saved to your decks`)
+            }
+            else{
+                errorDiv.hidden=false
+                errorDiv.innerText=responseMessage.error
+                //alert(responseMessage.error)
+            }
+        })
     })
 })(window.jQuery)

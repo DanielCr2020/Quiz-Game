@@ -76,6 +76,7 @@ router
             title:deck.name,
             userName:username,
             id:id,
+            creator:deck.creator,
             deckName:deck.name,
             deckSubject:deck.subject,
             dateCreated:deck.dateCreated,
