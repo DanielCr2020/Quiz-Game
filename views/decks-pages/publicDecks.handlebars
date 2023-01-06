@@ -1,5 +1,5 @@
 <main>
-    <h1 class="public-deck-h1">Public decks</h1>
+    <header class="title">Public decks</header>
     <ol class="deck-list">
         {{#each publicDeck}}
             <li><a href="/publicdecks/{{this._id}}">{{this.name}}</a> ||| Subject: {{this.subject}} ||| Creator: {{this.creator}}</li>

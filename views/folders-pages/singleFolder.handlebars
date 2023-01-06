@@ -20,7 +20,7 @@
     </form><br>
     <!-- remove deck from folder -->
     <p id="error3" class="error-p" hidden>{{error}}</p>
-    <form action="/yourpage/folders/{{id}}" method="DELETE" id="remove-deck-from-folder" class="add-deck-to-folder">
+    <form action="/yourpage/folders/{{id}}" id="remove-deck-from-folder" class="add-deck-to-folder">
         <label for="removeDeck">Remove deck from folder:</label>
         <select name="removeDeck" id="removeDeck">
                 <option>&lt;select deck&gt;</option>
@@ -28,7 +28,7 @@
                 <option value="{{this.name}}">{{this.name}}</option>
             {{/each}}
         </select><br>
-        <button type="submit" class="submit-button" id="submit-button">Remove deck</button>
+        <button type="submit" class="submit-button">Remove deck</button>
     </form><br>
 
     <p id="error" class="error-p" hidden>{{errorMessage}}</p>

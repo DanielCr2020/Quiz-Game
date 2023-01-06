@@ -8,8 +8,8 @@ function fn(str){       //adds leading 0 to 1 digit time numbers
     if(str.toString().length===1) str='0'+str.toString();
     return str
 }
-
-const createDeck = async (creator,deckName,subject,isPublic,cardsArray,dateCreated,user) => {
+            //also used for adding a public deck to a user's deck
+const createDeck = async (creator,deckName,subject,isPublic,cardsArray,dateCreated,user) => {       //"user" is for public decks. If the user and creator are different
     creator=validation.checkUsername(creator)
     deckName=validation.checkDeckName(deckName)
     subject=validation.checkSubject(subject)
@@ -21,11 +21,12 @@ const createDeck = async (creator,deckName,subject,isPublic,cardsArray,dateCreat
             throw `You already have a deck called ${deckName}`
     }
     if(Array.isArray(cardsArray)) cards=cardsArray
-    else cards=[]
+    else cards=[];
+
+    let d=new Date()
     if(typeof dateCreated=='undefined'){
         dateCreated=`${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()} ${fn(d.getHours())}:${fn(d.getMinutes())}:${fn(d.getSeconds())}`
     }
-    let d=new Date()
     let newDeck = {
         _id: ObjectId().toString(),
         name:deckName,
@@ -94,7 +95,11 @@ const getDeckById = async(username,deckId) => {
 const getDeckByOnlyId=async(deckId) => {            //uses aggregation to get a deck given only the id of a deck
     deckId=validation.checkId(deckId)
     const userCollection=await users()
-    const deckFoundCursor=await userCollection.aggregate([{"$unwind":"$decks"},{"$match":{"decks._id":deckId}},{"$replaceRoot":{"newRoot":"$decks"}}])
+    const deckFoundCursor=await userCollection.aggregate([
+        {"$unwind":"$decks"},
+        {"$match":{"decks._id":deckId}},
+        {"$replaceRoot":{"newRoot":"$decks"}}
+    ])
     let deckFound=(await deckFoundCursor.toArray())[0]
     if(!deckFound) throw "Unable to find that deck"
     return deckFound
