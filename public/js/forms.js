@@ -270,4 +270,26 @@
             }
         })
     })
+    //for sending a deck to another user
+    $("#send-deck-form").submit(function (event) {
+        event.preventDefault()
+        let user=$("#usernameInput").val().trim()
+        if(user) {
+            let requestConfig={
+                method:"POST",
+                data:{user:user,sendDeck:true}          //sendDeck is used to determine which route is run
+            }
+            $.ajax(requestConfig).then(function (responseMessage) {
+                if(responseMessage.success){
+                    errorDiv3.hidden=true
+                    alert(`This deck was sent to ${user}`)
+                }
+                else {
+                    errorDiv3.hidden=false
+                    errorDiv3.innerText=responseMessage.error
+                }
+                $('#send-deck-form').trigger('reset')
+            })
+        }
+    })
 })(window.jQuery)

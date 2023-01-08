@@ -6,6 +6,7 @@ const configRoutes=require('./routes')
 const connection=require('./config/mongoConnection')
 const exphbs=require('express-handlebars')
 const decks=require('./data/decks')
+const folders=require('./data/folders')
 const validation=require('./validation')
 
 app.use('/public',static)
@@ -49,6 +50,7 @@ app.use('/yourpage/decks/:id/:cardNumber', async(req,res,next) => {         //ca
     res.ignore=true
     next()
 })
+//checks if the user owns that deck
 app.use('/yourpage/decks/:id', async (req,res,next) => {     //if the id in the url does not belong to the user's decks (the deck was made by another user, or the deck is invalid)
     if (!req.session.user) {
         return res.redirect('/')
@@ -56,15 +58,15 @@ app.use('/yourpage/decks/:id', async (req,res,next) => {     //if the id in the 
     if(!res.ignore) {   //used for when we are at a card route. If we are, we have already verified ownership. We need to therefore ignore to avoid issues.
         let id=req.params.id
         let username=req.session.user.username
-        try{
+        try{        //validating input
             id=validation.checkId(id)
             username=validation.checkUsername(username)
         }
         catch(e){
             console.log(e)
         }
-        try{
-            doesOwn=await decks.getDeckById(username,id)    //if getDeckById for a username throws, the user does not have that deck
+        try{        //checking ownership
+            doesOwn=await decks.getDeckById(username,id)    //if getDeckById for a username throws, the user does not own that deck
         }
         catch(e){
             console.log("You do not own that deck")
@@ -75,6 +77,29 @@ app.use('/yourpage/decks/:id', async (req,res,next) => {     //if the id in the 
     else{
         next()
     }
+})
+//checks if the user owns that folder
+app.use('/yourpage/folders/:id', async(req,res,next) => {
+    if (!req.session.user) {
+        return res.redirect('/')
+    }
+    let id=req.params.id
+    let username=req.session.user.username
+    try{            //validating input
+        id=validation.checkId(id)
+        username=validation.checkUsername(username)
+    }
+    catch(e){
+        console.log(e)
+    }
+    try{            //checking ownership    
+        doesOwn=await folders.getFolderById(username,id)    //if getFolderById for a username throws, the user does not own that folder
+    }
+    catch(e){
+        console.log("You do not own that folder")
+        return res.redirect('/yourpage/folders')
+    }
+    next()
 })
 app.use('/login', (req, res, next) => {
     if (req.session.user) {

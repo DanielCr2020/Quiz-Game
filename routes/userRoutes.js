@@ -132,7 +132,7 @@ router
             id=validation.checkId(req.params.id)
             username=validation.checkUsername(req.session.user.username)
             publicDeck=await decks.getDeckByOnlyId(id)
-            await decks.createDeck(publicDeck.creator,publicDeck.name,publicDeck.subject,false,publicDeck.cards,publicDeck.dateCreated,username)
+            await decks.createDeck(publicDeck.creator,publicDeck.name,publicDeck.subject,false,publicDeck.cards,publicDeck.dateCreated,username,true)
             //if(username) username=validation.checkUsername(username)
         }
         catch(e){

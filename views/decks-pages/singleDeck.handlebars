@@ -1,10 +1,10 @@
 <main>
-    <header>Created by: {{creator}}<br>on {{dateCreated}}</header>
+    <header>Created by: {{creator}} ||| on: {{dateCreated}}</header>
     <div class="cards-div">
         <div class="deck-labels">
             <h1 id="deckName" class="deckName">{{deckName}}</h1>
             <h2 id="deckSubject" class="deckSubject">{{deckSubject}}</h2>
-        </div>
+        </div>      <!-- create a card -->
         <form action="/yourpage/decks/{{id}}" method="POST" id="create-card-form" class="create-card-form">
             <p class="create-card-p">Create a card</p><br>
             <p id="error2" class="error-p" hidden>{{errorMessage}}</p>
@@ -13,16 +13,16 @@
             <label for="cardBackInput">Back</label>
             <textarea id="cardBackInput" rows="4" cols="28"></textarea> <br>
             <button type="submit">Add card</button>
-        </form>
+        </form>     <!-- cards list -->
         <div class="card-page-column">
-        <p class="left-align">Cards</p>
+            <p class="left-align">Cards</p>
             <ol id="deck-list" class="card-list">
                 {{#each card}}
                     <li><a href="{{../id}}/{{this.number}}"> {{this.front}} ||| {{this.back}}</a></li>
                 {{/each}}
             </ol>
         </div>
-    </div>
+    </div>      <!-- editing deck -->
     <p id="error" class="error-p" hidden>{{errorMessage}}</p>
     <form action="/yourpage/decks/{{id}}" id="edit-deck-form" class="create-deck-form">
         <label for="decknameInput">Enter new deck name</label> <br>
@@ -33,11 +33,18 @@
         {{#if public}}          <!-- if the deck is already public -->
             <input id="isDeckPublic" type="checkbox" name="isDeckPublic" checked>
         {{else}}
-            <input id="isDeckPublic" type="checkbox" name="isDeckPublic">
+            <input id="isDeckPublic" type="checkbox" name="isDeckPublic" >
         {{/if}}
         <br><button type="submit">Update deck</button>
     </form>
-    <div class="error" hidden>{{errorMessage}}</div>
+    <!-- sending deck to another user -->
+    <p id="error3" class="error-p" hidden>{{errorMessage}}</p>
+    <form action="/yourpage/decks/{{id}}" id="send-deck-form" class="create-deck-form">
+        <label for="usernameInput">Send this deck to another user</label><br>
+        <input id="usernameInput" type="text" name="usernameInput"><br>
+        <button type="submit">Send this deck</button>
+    </form>
+    <!-- bottom row -->
     <footer>
         <nav class="bottom-row">
             <a href="/yourpage/decks">Back to your decks</a>

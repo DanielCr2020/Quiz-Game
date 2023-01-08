@@ -34,7 +34,7 @@ router
             username=validation.checkUsername(req.session.user.username)
             yourFolders=await users.getUsersFolders(username)
             newFolder=await folders.createFolder(username,folderName)
-            newFolderId=validation.checkId(newFolder._id.toString())
+            newFolderId=validation.checkId(newFolder._id.toString())        //checks id after folder was made
         }
         catch(e){
             console.log(e)
@@ -46,11 +46,8 @@ router
             return;
         }
         res.json({
-            title:newFolder.name,
             name:newFolder.name,
             id:newFolderId,
-            folder:yourFolders,
-            userName:username,
             success:true
         })
     })
@@ -114,30 +111,24 @@ router
     })
     .patch(async(req,res) => {          //  /yourpage/folders/:id  patch route.  change folder name
         if(!req.body) {res.sendStatus(400); return;}
-        let folderId=undefined; let username=undefined; let newFolderName=undefined; //let decks=undefined;
+        let folderId=undefined; let username=undefined; let newFolderName=undefined; 
         try{
             username=validation.checkUsername(req.session.user.username)
             folderId=validation.checkId(req.params.id)
             folder=await folders.getFolderById(username,folderId)
             newFolderName=validation.checkFolderName(req.body.newFolderName)
             await folders.editFolder(username,folderId,newFolderName)
-            //decks=await decks.getUsersDecks(username)
         }
         catch(e){
             console.log(e)
             res.json({
-                title:"Could not rename folder",
-                id:folderId,
                 errorMessage:e.toString(),
                 success:false
             })
             return
         }
         res.json({
-            title:newFolderName,
-            id:folderId,
             folderName:newFolderName,
-            //deck:decks,
             success:true
         })
     })
@@ -151,7 +142,7 @@ router
             console.log(e)
             res.json({
                 success:false,
-                error:e
+                error:e.toString()
             })
             return
         }

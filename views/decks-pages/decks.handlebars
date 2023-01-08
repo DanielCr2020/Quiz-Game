@@ -1,13 +1,13 @@
 <main>
     <header class="title">{{userName}}'s Decks</header>
     <p id="error" class="error-p" hidden>{{errorMessage}}</p>
-    <div class="deck-page-content">
+    <div class="deck-page-content">     <!-- create a deck -->
         <form action="/yourpage/decks" method="POST" id="create-deck-form" class="create-deck-form">
             <label for="decknameInput">Deck name:</label><input id="decknameInput" type="text" name="decknameInput"><br>
             <label for="decksubjectInput">Deck subject:</label><input id="decksubjectInput" type="text" name="decksubjectInput"><br>
             <button type="submit" class="submit-button">Create Deck</button>
-        </form>
-        <div class="deck-page-column">
+        </form> 
+        <div class="deck-page-column">      <!-- deck list -->
             <ol id="deck-list" class="deck-list">
                 {{#each deck}}
                     <li><a href="decks/{{this._id}}">{{this.name}}</a> - Subject: {{this.subject}}</li>

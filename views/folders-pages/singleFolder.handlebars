@@ -1,7 +1,7 @@
 <main>
-    <header><br>Created on: {{dateCreated}}</header>
+    <header>Created on: {{dateCreated}}</header>
     <h1 id="folderName" class="deckName">{{folderName}}</h1>
-    <ol id="deck-list" class="deck-list">
+    <ol id="deck-list" class="deck-list">       <!-- decks in folder --> 
         {{#each deckInFolder}}
             <li><a href="/yourpage/decks/{{this._id}}">{{this.name}}</a> - Subject: {{this.subject}}</li>
         {{/each}}
@@ -30,7 +30,7 @@
         </select><br>
         <button type="submit" class="submit-button">Remove deck</button>
     </form><br>
-
+    <!-- edit folder name -->
     <p id="error" class="error-p" hidden>{{errorMessage}}</p>
     <form action="/yourpage/folders/{{id}}" id="edit-folder-form" class="edit-deck-form">
         <label for="foldernameInput">Enter new folder name</label>

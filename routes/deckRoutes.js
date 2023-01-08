@@ -4,7 +4,7 @@ const path=require('path')
 const users=require('../data/users')
 const decks=require('../data/decks')
 const validation=require('../validation')
-const xss=require('xss')
+//Pretty much every request except GET are done with AJAX
 //      /yourpage/decks
 router
     .route('/')         
@@ -19,18 +19,17 @@ router
             console.log(e)
             if(!yourDecks) res.status(500).send("Internal Server Error (GET /yourpage/decks)")
             return
-        }       //since it's getting, we can render
+        }       //get request gets everything on the page. We only need to render.
         res.render(path.resolve('views/decks-pages/decks.handlebars'),{title:username,deck:yourDecks,userName:username})
     })
-    .post(async(req,res) => {      //      /decks post route (when you make a new deck)
+    .post(async(req,res) => {      //   AJAX    /decks post route (when you make a new deck)
         if(!req.body) {res.sendStatus(400); return;}
         let name=undefined; let subject=undefined; let username=undefined;
-        let newDeck=undefined; let yourDecks=undefined; let newDeckId=undefined;     //creating deck
+        let newDeck=undefined; let newDeckId=undefined;     //creating deck
         try{
             name=validation.checkDeckName(req.body.name);
             subject=validation.checkSubject(req.body.subject);
             username=validation.checkUsername(req.session.user.username);
-            yourDecks=await users.getUsersDecks(username)
             newDeck=await decks.createDeck(username,name,subject,false)
             newDeckId=validation.checkId(newDeck._id.toString())        //checks the new deck id
         }
@@ -38,7 +37,6 @@ router
             console.log(e)
             res.json({
                 title:"Cannot create deck",
-                deck:yourDecks,
                 success:false,
                 error:e.toString()
             })
@@ -47,12 +45,9 @@ router
         }
         //was able to create deck
         res.json({
-            title:username,
             subject:newDeck.subject,
             newName:newDeck.name,
-            deck:yourDecks,
             id:newDeckId,
-            userName:username,
             success:true
         })
     })
@@ -84,36 +79,57 @@ router
             card:deck.cards
         })
     })
-    .post(async(req,res) => {           //      /:id        post route  (making a new card)
+    .post(async(req,res) => {           //   AJAX   /:id        post route  (making a new card)   or sending deck to another user
         if(!req.body) {res.sendStatus(400); return;}
-        let front=undefined; let back=undefined; let username=undefined; let newCard=undefined; let deckId=undefined;
-        try{            //validation
-            front=validation.checkCard(req.body.front,"front")
-            back=validation.checkCard(req.body.back,"back")
-            username=validation.checkUsername(req.session.user.username)
-            deckId=validation.checkId(req.params.id)
-            newCard=await decks.createCard(username,deckId,front,back)
-        }
-        catch(e){
-            console.log(e)
+        if(!req.body.sendDeck) {            // creating a new card
+            let front=undefined; let back=undefined; let username=undefined; let newCard=undefined; let deckId=undefined;
+            try{            //validation
+                front=validation.checkCard(req.body.front,"front")
+                back=validation.checkCard(req.body.back,"back")
+                username=validation.checkUsername(req.session.user.username)
+                deckId=validation.checkId(req.params.id)
+                newCard=await decks.createCard(username,deckId,front,back)
+            }
+            catch(e){
+                console.log(e)
+                res.json({
+                    title:"Cannot create card",
+                    success:false,
+                    error:e
+                })
+                return
+            }
             res.json({
-                title:"Cannot create card",
-                success:false,
-                error:e
+                id:deckId,
+                number:newCard.number,      //cards each have a number, which is used for indexing and the url.
+                front:front,
+                back:back,
+                success:true
             })
-            return
         }
-        res.json({
-            title:front,
-            id:deckId,
-            number:newCard.number,      //cards each have a number, which is used for indexing and the url.
-            front:front,
-            back:back,
-            success:true
-        })
-
+        else {          //sending a deck to another user
+            let receiver=undefined; let deckId=undefined; let username=undefined; let currentDeck=undefined;
+            try{
+                receiver=validation.checkUsername(req.body.user)
+                deckId=validation.checkId(req.params.id)
+                username=validation.checkUsername(req.session.user.username)
+                currentDeck=await decks.getDeckById(username,deckId)            //inserting the same deck with all the same info
+                await decks.createDeck(username,currentDeck.name,currentDeck.subject,false,currentDeck.cards,currentDeck.dateCreated,receiver,false)
+            }
+            catch(e){
+                console.log(e)
+                res.json({
+                    error:e.toString(),
+                    success:false
+                })
+                return
+            }
+            res.json({
+                success:true
+            })
+        }
     })
-    .patch(async(req,res) => {          //      /:id    patch       updating a deck
+    .patch(async(req,res) => {          //   AJAX   /:id    patch       updating a deck
         let deckId=undefined;let newDeckName=req.body.name; let newDeckSubject=req.body.subject; let username=undefined;
         let deckToEdit=undefined;
         try{
@@ -144,31 +160,24 @@ router
             return
         }
         res.json({
-            title:newDeckName,
-            id:deckId,
             deckName:newDeckName,
             deckSubject:newDeckSubject,
-            public:req.body.public,
             success:true
         })
     })
-    .delete(async(req,res) => {             //      /decks/:id  delete route. Deleting a deck
-        let id=undefined;
-        try{id=validation.checkId(req.params.id)}
+    .delete(async(req,res) => {             //   AJAX   /decks/:id  delete route. Deleting a deck
+        let id=undefined; let username=undefined; 
+        try{
+            id=validation.checkId(req.params.id)
+            username=validation.checkUsername(req.session.user.username)
+            await decks.deleteDeck(username,id)
+        }
         catch(e){
             console.log(e)
             res.json({
                 success:false,
                 error:e
             })
-            return
-        }
-        try{
-            let username=validation.checkUsername(req.session.user.username)
-            await decks.deleteDeck(username,id)
-        }
-        catch(e){
-            console.log(e)
             return
         }
         res.json({
@@ -202,7 +211,7 @@ router
             deckName:deck.name
         })
     })
-    .patch(async(req,res) => {      //      /yourpage/decks/:id/:cardNumber     patch route. Updating a card
+    .patch(async(req,res) => {      //   AJAX   /yourpage/decks/:id/:cardNumber     patch route. Updating a card
         if(!req.body) {res.sendStatus(400); return;}
         let deckId=undefined; let front=req.body.front; let back=req.body.back; let username=undefined;
         let deck=undefined; let isFrontSame=false;
@@ -222,26 +231,20 @@ router
         catch(e){
             console.log(e)
             res.json({
-                title:front,
                 cardFront:front,
                 cardBack:back,
-                id:deckId,
-                errorMessage:e,
-                deckName:deck.name,
+                errorMessage:e.toString(),
                 success:false
             })
             return
         }
         res.json({
-            title:front,
             cardFront:front,
             cardBack:back,
-            id:deckId,
-            deckName:deck.name,
             success:true
         })
     })
-    .delete(async(req,res) => {     //      /yourpage/decks/:id/:cardNumber     delete route. Deleting a card
+    .delete(async(req,res) => {     //   AJAX   /yourpage/decks/:id/:cardNumber     delete route. Deleting a card
         if(!req.body) {res.sendStatus(400); return;}
         let deckId=undefined; let username=undefined;
         try{

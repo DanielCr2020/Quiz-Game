@@ -8,7 +8,7 @@ function fn(str){       //adds leading 0 to 1 digit time numbers
     return str
 }
 
-const createFolder = async(username,folderName) => {
+const createFolder = async(username,folderName) => {        //same idea as createDeck, but we only need to deal with adding folders to one person
     username=validation.checkUsername(username)
     folderName=validation.checkFolderName(folderName)
 
@@ -22,7 +22,7 @@ const createFolder = async(username,folderName) => {
         _id:ObjectId().toString(),
         name:folderName,
         dateCreated: `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()} ${fn(d.getHours())}:${fn(d.getMinutes())}:${fn(d.getSeconds())}`,
-        decks:[]
+        decks:[]            //contains deck id's
     }
     const insertFolder=await userCollection.updateOne(
         {username:username},
@@ -32,7 +32,7 @@ const createFolder = async(username,folderName) => {
     return newFolder
 }
 
-const deleteFolder=async(username,folderId) => {
+const deleteFolder=async(username,folderId) => {        //deletes folder from array of subdocuments in user.
     username=validation.checkUsername(username)
     folderId=validation.checkId(folderId)
     const userCollection=await users();
@@ -44,19 +44,19 @@ const deleteFolder=async(username,folderId) => {
     return updatedUser
 }
 
-const editFolder=async(username,folderId,newFolderName) => {
+const editFolder=async(username,folderId,newFolderName) => {        //renaming a folder
     username=validation.checkUsername(username)
     folderId=validation.checkId(folderId)
     newFolderName=validation.checkFolderName(newFolderName);
     const userCollection=await users();
     const folderCreator=await userCollection.findOne({username:username})
-    for(folder of folderCreator.folders)
+    for(folder of folderCreator.folders)            //makes sure the new name is not the existing name of a folder
         if(folder.name.toLowerCase()===newFolderName.toLowerCase()) 
             throw "You already have a folder named "+newFolderName
     
     const editedFolder=userCollection.updateOne(
         {username:username,"folders._id":folderId},
-        {$set: {"folders.$.name":newFolderName}}
+        {$set: {"folders.$.name":newFolderName}}            //changes just the folder's name
     )
     if(editedFolder.modifiedCount===0) throw "Unable to edit folder"
     return await getFolderById(username,folderId)
@@ -76,13 +76,13 @@ const getFolderById=async(username,folderId) => {
     return folderFound
 }
 
-const addDeckToFolder=async(username,folderId,deckId) => {
+const addDeckToFolder=async(username,folderId,deckId) => {      //add deck (deckId) to user's (username) folder (folderId)
     username=validation.checkUsername(username)
     folderId=validation.checkId(folderId)
     deckId=validation.checkId(deckId)
     const userCollection=await users()
     let folder=await getFolderById(username,folderId)
-    if(folder.decks.includes(deckId)) throw "That deck is already in that folder"
+    if(folder.decks.includes(deckId)) throw "That deck is already in that folder"       //just checking by deckIds
     const updatedFolder=await userCollection.updateOne(
         {username:username,"folders._id":folderId},
         {$push: {"folders.$.decks":deckId}}
@@ -91,13 +91,13 @@ const addDeckToFolder=async(username,folderId,deckId) => {
     return await getFolderById(username,folderId)
 }
 
-const removeDeckFromFolder=async(username,folderId,deckId) => {
+const removeDeckFromFolder=async(username,folderId,deckId) => {     //remove deck (deckId) from user's (username) folder (folderId)
     username=validation.checkUsername(username)
     folderId=validation.checkId(folderId)
     deckId=validation.checkId(deckId)
     const userCollection=await users()      
     const existingDecks=(await getFolderById(username,folderId)).decks      //those parentheses need to be there
-    if(!existingDecks.find(id => id===deckId)) throw "That deck is not in that folder"
+    if(!existingDecks.find(id => id===deckId)) throw "That deck is not in that folder"      //find searches for an id in the folder equal to deckId
     const updatedFolder=await userCollection.updateOne(
         {username:username,"folders._id":folderId},
         {$pull: {"folders.$.decks":deckId}}
