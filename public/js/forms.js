@@ -16,7 +16,7 @@
             $.ajax(requestConfig).then(function (responseMessage) {
                 if(responseMessage.success) {
                     errorDiv.hidden=true        //sets us list item HTML
-                    let listItem=`<li><a href="decks/${responseMessage.id}">${responseMessage.newName}</a> - Subject: ${responseMessage.subject}</li>`
+                    let listItem=`<li><a href="decks/${responseMessage.id}">${responseMessage.newName}</a> - [Subject]: ${responseMessage.subject}</li>`
                     $('#deck-list').append(listItem)
                 }
                 else{
@@ -218,7 +218,7 @@
             $.ajax(requestConfig).then(function (responseMessage) {
                 if(responseMessage.success){
                     errorDiv2.hidden=true
-                    let listItem=`<li><a href="/yourpage/decks/${responseMessage.id}">${responseMessage.deckName}</a> - Subject: ${responseMessage.subject}</li>`
+                    let listItem=`<li><a href="/yourpage/decks/${responseMessage.id}">${responseMessage.deckName}</a> - [Subject]: ${responseMessage.subject}</li>`
                     $('#deck-list').append(listItem)
                 }
                 else{
@@ -289,6 +289,48 @@
                     errorDiv3.innerText=responseMessage.error
                 }
                 $('#send-deck-form').trigger('reset')
+            })
+        }
+    })
+    //for sorting decks
+    $("#sort-decks-form").submit(function (event) {
+        event.preventDefault()
+        let sortBy=$('#sortDecksBy').val();
+        if(sortBy){
+            let requestConfig={
+                method:"POST",
+                data:{sortBy:sortBy,decksOnPage:$('#deck-list')[0].innerText.replace(/( - \[Subject\]:)/g,"")}
+            }
+            $.ajax(requestConfig).then(function (responseMessage) {
+                if(responseMessage.success){
+                    let sorted=""           //takes the sorted decks from the request and builds the HTML
+                    for(deck of responseMessage.sortedDecks){
+                        sorted+=`<li><a href="decks/${deck.id}">${deck.name}</a> - [Subject]: ${deck.subject}</li>\n`
+                    }
+                    $('#deck-list')[0].innerHTML=sorted
+                }
+            })
+        }
+    })
+    //for searching decks
+    $('#filter-decks-form').submit(function (event) {
+        event.preventDefault()
+        let searchBy=$('#searchDecksInput').val().trim()
+        if(!searchBy) searchBy=" "
+        if(searchBy){
+            let requestConfig={
+                method:"POST",
+                data:{searchBy:searchBy}
+            }
+            $.ajax(requestConfig).then(function (responseMessage) {
+                if(responseMessage.success){
+                    let searched=""
+                    for(deck of responseMessage.foundDecks){
+                        searched+=`<li><a href="decks/${deck.id}">${deck.name}</a> - [Subject]: ${deck.subject}</li>\n`
+                    }
+                    $('#deck-list')[0].innerHTML=searched
+                }
+                $('#filter-decks-form').trigger('reset')
             })
         }
     })

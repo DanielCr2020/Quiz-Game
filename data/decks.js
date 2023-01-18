@@ -28,7 +28,7 @@ const createDeck = async (creator,deckName,subject,isPublic,cardsArray,dateCreat
 
     let d=new Date()
     if(typeof dateCreated=='undefined'){        //if date is not given, we are making a deck. If it is, use that.
-        dateCreated=`${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()} ${fn(d.getHours())}:${fn(d.getMinutes())}:${fn(d.getSeconds())}`
+        dateCreated=`${d.getFullYear()}-${fn(d.getMonth()+1)}-${fn(d.getDate())} ${fn(d.getHours())}:${fn(d.getMinutes())}:${fn(d.getSeconds())}`
     }
     let newDeck = {
         _id: ObjectId().toString(),
@@ -226,6 +226,21 @@ const getPublicDecks=async() => {
     return publicDecks
 }
 
+function sortDecks(decksList,sortBy,om){        //om is order multiplier. 1 sort by ascending. -1 sorts by descending
+    if(sortBy==='name'||sortBy==='name_desc')
+        return decksList.sort((a,b) => {
+            return a.name.toLowerCase()<b.name.toLowerCase() ? -1*om : a.name.toLowerCase()===b.name.toLowerCase() ? 0 : 1*om}
+        )
+    if(sortBy==='date'||sortBy==='date_desc')
+        return decksList.sort((a,b) => {
+            return a.date<b.date ? -1*om : a.date===b.date ? 0 : 1*om}
+        )
+    if(sortBy==='subject'||sortBy==='subject_desc')
+        return decksList.sort((a,b) => {
+            return a.subject.toLowerCase()<b.subject.toLowerCase() ? -1*om : a.subject.toLowerCase()===b.subject.toLowerCase() ? 0 : 1*om}
+        )
+}
+
 module.exports = {
     createDeck,
     getUsersDecks,
@@ -238,5 +253,6 @@ module.exports = {
     createCard,
     editCard,
     deleteCard,
-    getPublicDecks
+    getPublicDecks,
+    sortDecks
 }

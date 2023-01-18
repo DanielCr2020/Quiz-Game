@@ -27,29 +27,84 @@ router
         let name=undefined; let subject=undefined; let username=undefined;
         let newDeck=undefined; let newDeckId=undefined;     //creating deck
         try{
-            name=validation.checkDeckName(req.body.name);
-            subject=validation.checkSubject(req.body.subject);
             username=validation.checkUsername(req.session.user.username);
-            newDeck=await decks.createDeck(username,name,subject,false)
-            newDeckId=validation.checkId(newDeck._id.toString())        //checks the new deck id
         }
         catch(e){
             console.log(e)
-            res.json({
-                title:"Cannot create deck",
-                success:false,
-                error:e.toString()
-            })
-            res.status(400)
             return
         }
-        //was able to create deck
-        res.json({
-            subject:newDeck.subject,
-            newName:newDeck.name,
-            id:newDeckId,
-            success:true
-        })
+        if(req.body.sortBy){
+            let userDecks=undefined;
+            try{
+                userDecks=await users.getUsersDecks(username)
+            }
+            catch(e){
+                console.log(e)
+                res.json({success:false,error:e})
+                return
+            }
+                                                //gets id, name, subject, and date created from decks. All sortable things
+            let extractedDeckInfo=userDecks.map((deck)=>{return {id:deck._id,name:deck.name,subject:deck.subject,date:deck.dateCreated}})
+            extractedDeckInfo=extractedDeckInfo.filter((deck)=>{ 
+                return req.body.decksOnPage.includes(deck.name)||req.body.decksOnPage.includes(deck.subject)}
+            )
+            let sortedDecks=undefined;
+            if(req.body.sortBy.includes("_desc")) {
+                sortedDecks=decks.sortDecks(extractedDeckInfo,req.body.sortBy,-1)       //last parameter is for ascending or descending
+            }
+            else {
+                sortedDecks=decks.sortDecks(extractedDeckInfo,req.body.sortBy,1)
+            }
+            res.json({
+                sortedDecks:sortedDecks,
+                success:true
+            })
+        }
+        else if(req.body.searchBy){
+            let foundDecks=undefined;
+            try{
+                foundDecks=await decks.getUsersDecks(username)
+                if(req.body.searchBy!==' ')
+                foundDecks=foundDecks.filter((deck) => {
+                    return deck.name.toLowerCase().includes(req.body.searchBy.toLowerCase())||deck.subject.toLowerCase().includes(req.body.searchBy.toLowerCase())
+                })
+            }
+            catch(e){
+                console.log(e)
+                res.json({success:false,error:e})
+                return
+            }
+            foundDecks=foundDecks.map((deck)=>{return {id:deck._id,name:deck.name,subject:deck.subject}})
+            res.json({
+                foundDecks:foundDecks,
+                success:true
+            })
+        }
+        else {
+            try{
+                name=validation.checkDeckName(req.body.name);
+                subject=validation.checkSubject(req.body.subject);
+                newDeck=await decks.createDeck(username,name,subject,false)
+                newDeckId=validation.checkId(newDeck._id.toString())        //checks the new deck id
+            }
+            catch(e){
+                console.log(e)
+                res.json({
+                    title:"Cannot create deck",
+                    success:false,
+                    error:e.toString()
+                })
+                res.status(400)
+                return
+            }
+            //was able to create deck
+            res.json({
+                subject:newDeck.subject,
+                newName:newDeck.name,
+                id:newDeckId,
+                success:true
+            })
+        }
     })
 
 router

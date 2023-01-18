@@ -1,20 +1,41 @@
 <main>
     <header class="title">{{userName}}'s Decks</header>
-    <p id="error" class="error-p" hidden>{{errorMessage}}</p>
+    <p id="error" class="error-p" hidden>{{errorMessage}}</p>    
+        
     <div class="deck-page-content">     <!-- create a deck -->
+    <div class="deck-forms-vertical">
         <form action="/yourpage/decks" method="POST" id="create-deck-form" class="create-deck-form">
             <label for="decknameInput">Deck name:</label><input id="decknameInput" type="text" name="decknameInput"><br>
             <label for="decksubjectInput">Deck subject:</label><input id="decksubjectInput" type="text" name="decksubjectInput"><br>
             <button type="submit" class="submit-button">Create Deck</button>
-        </form> 
+        </form>                             <!-- sort decks form -->
+        <form action="/yourpage/decks" method="POST" id="sort-decks-form" class="create-deck-form">
+            <label for="sortDecksBy">Sort decks</label><br>
+            <select name="sortDecksBy" id="sortDecksBy">
+                <option value="date">By date (oldest first)</option>
+                <option value="name">By name</option>
+                <option value="subject">By subject</option>
+                <option value="date_desc">By date (newest first)</option>
+                <option value="name_desc">By name (descending)</option>
+                <option value="subject_desc">By subject (descending)</option>
+            </select> <br>
+            <button type="submit" class="submit-button">Sort decks</button>
+        </form>
+        <form action="/yourpage/decks" method="POST" id="filter-decks-form" class="create-deck-form">
+            <label for="searchDecksInput">Search decks</label>
+            <input id="searchDecksInput" type="text" name="searchDecksInput" placeholder="name or subject"><br>
+            <button type="submit" class="submit-button">Search decks</button>
+        </form>
+    </div>
         <div class="deck-page-column">      <!-- deck list -->
             <ol id="deck-list" class="deck-list">
-                {{#each deck}}
-                    <li><a href="decks/{{this._id}}">{{this.name}}</a> - Subject: {{this.subject}}</li>
+                {{#each deck}}  
+                    <li><a href="decks/{{this._id}}">{{this.name}}</a> - [Subject]: {{this.subject}}</li>
                 {{/each}}
             </ol>
         </div>
     </div>
+    
     <footer>
         <nav>
             <a href="/yourpage">Back to your profile</a>

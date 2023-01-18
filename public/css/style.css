@@ -31,12 +31,12 @@ footer {
     font-size: 32px;
 }
 input {
-    background-color: var(--gray-100);
+    /*background-color: var(--gray-100);*/
     border-color: black;
     
 }
 textarea {
-    background-color: var(--gray-100);
+    /*background-color: var(--gray-100);*/
     border-color: black;
 }
 div.right-align{
@@ -78,6 +78,9 @@ button:hover {
 button:active {
     background-color:var(--button-active-color);
     transition: 0s;
+}
+select {
+    font-size: 24px;
 }
 /*Login form*/
 .login-form {
@@ -162,14 +165,14 @@ a.home {
     display:flex;
     flex-direction: row;
     justify-content: left;
-    width:80%;
+    width:90%;
     margin-left: 10px;
 }
 .deck-page-column {
     display:flex;
     flex-direction: column;
     justify-content: center;
-    width:50%;
+    width:100%;
     margin-left: 60px;
 }
 /*Single deck*/
@@ -196,7 +199,7 @@ div.card-page-content {
     font-size: 36px;
     flex-direction: row;
     justify-content: left;
-    width:95%;
+    width:100%;
     margin-left: 30px;
     position:static;
     bottom:0;
