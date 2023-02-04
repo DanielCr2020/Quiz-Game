@@ -4,8 +4,9 @@
         <div class="deck-labels">
             <h1 id="deckName" class="deckName">{{deckName}}</h1>
             <h2 id="deckSubject" class="deckSubject">{{deckSubject}}</h2>
-        </div>      <!-- create a card -->
-        <form action="/yourpage/decks/{{id}}" method="POST" id="create-card-form" class="create-card-form">
+        </div>      
+        <div>       <!-- create a card -->
+            <form action="/yourpage/decks/{{id}}" method="POST" id="create-card-form" class="create-card-form">
             <p class="create-card-p">Create a card</p><br>
             <p id="error2" class="error-p" hidden>{{errorMessage}}</p>
             <label for="cardFrontInput">Front</label>
@@ -13,7 +14,22 @@
             <label for="cardBackInput">Back</label>
             <textarea id="cardBackInput" rows="4" cols="28"></textarea> <br>
             <button type="submit">Add card</button>
-        </form>     <!-- cards list -->
+            </form>     <!-- editing deck --> <br>
+            <p id="error" class="error-p" hidden>{{errorMessage}}</p>
+            <form action="/yourpage/decks/{{id}}" id="edit-deck-form" class="create-deck-form">
+                <label for="decknameInput">Enter new deck name</label> <br>
+                <input id="decknameInput" type="text" name="decknameInput"><br>
+                <label for="decksubjectInput">Enter new deck subject</label> <br>
+                <input id="decksubjectInput" type="text" name="decksubjectInput"> <br>
+                <label for="isDeckPublic">Is this deck public?</label>
+                {{#if public}}          <!-- if the deck is already public -->
+                    <input id="isDeckPublic" type="checkbox" name="isDeckPublic" checked>
+                {{else}}
+                    <input id="isDeckPublic" type="checkbox" name="isDeckPublic" >
+                {{/if}}
+                <br><button type="submit">Update deck</button>
+            </form>
+        </div>      <!-- cards list -->
         <div class="card-page-column">
             <p class="left-align">Cards</p>
             <ol id="deck-list" class="card-list">
@@ -22,21 +38,7 @@
                 {{/each}}
             </ol>
         </div>
-    </div>      <!-- editing deck -->
-    <p id="error" class="error-p" hidden>{{errorMessage}}</p>
-    <form action="/yourpage/decks/{{id}}" id="edit-deck-form" class="create-deck-form">
-        <label for="decknameInput">Enter new deck name</label> <br>
-        <input id="decknameInput" type="text" name="decknameInput"><br>
-        <label for="decksubjectInput">Enter new deck subject</label> <br>
-        <input id="decksubjectInput" type="text" name="decksubjectInput"> <br>
-        <label for="isDeckPublic">Is this deck public?</label>
-        {{#if public}}          <!-- if the deck is already public -->
-            <input id="isDeckPublic" type="checkbox" name="isDeckPublic" checked>
-        {{else}}
-            <input id="isDeckPublic" type="checkbox" name="isDeckPublic" >
-        {{/if}}
-        <br><button type="submit">Update deck</button>
-    </form>
+    </div>      
     <!-- sending deck to another user -->
     <p id="error3" class="error-p" hidden>{{errorMessage}}</p>
     <form action="/yourpage/decks/{{id}}" id="send-deck-form" class="create-deck-form">
@@ -48,6 +50,7 @@
     <footer>
         <nav class="bottom-row">
             <a href="/yourpage/decks">Back to your decks</a>
+            <a href="/yourpage/study/matching/{{id}}">Practice this deck with a matching game</a>
             <button type="submit" class="delete-deck" id="delete-deck">Delete this deck</button>
         </nav>
     </footer>

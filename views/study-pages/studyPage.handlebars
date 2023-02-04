@@ -1,0 +1,31 @@
+<main>
+    <h1 class="study-header">Study page</h1>
+    <div class="study-page-div">
+        <div class="pick-stuff">
+            <!-- pick quiz and deck form -->
+            <form action="/yourpage/study" method="POST" id="pick-quiz-and-deck-form" class="create-deck-form">
+                <label for="pickDeck">Pick deck</label><br>
+                <select name="pickDeck" id="pickDeck">
+                    {{#each deck}}
+                        <option value="{{this._id}}">{{this.name}}</option>
+                    {{/each}}
+                </select> <br>
+                <label for="pickQuiz">Pick quiz</label><br>
+                <select name="pickQuiz" id="pickQuiz">
+                    <option value="matching">Matching</option>
+                    <option value="fill-in">Fill in the blank</option>
+                </select><br>
+                <button type="submit" class="submit-button">Take quiz</button>
+            </form>
+        </div>
+        <!-- quiz results -->
+        <ol class="quizzes-list">
+            <p>Quiz results summary</p>
+            <a href="/yourpage/study/results">View all of your quiz results</a>
+            <li>Here is your quiz</li>
+            {{#each quiz}}
+                <li>Quiz here:</li>
+            {{/each}}
+        </ol>
+    </div>
+</main>

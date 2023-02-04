@@ -1,8 +1,20 @@
 <main>
     <header class="title">Public decks</header>
-    <ol class="deck-list">
+    <div>
+    <form action="/publicdecks" method="POST" id="search-public-decks-form" class="create-deck-form">
+        <label>Search public decks (leave blank to reset)</label><br>
+        <label for="spdName">By name</label>
+        <input id="spdName" type="text" name="spdName" placeholder="By name">\
+        <label for="spdSubject">By subject</label>
+        <input id="spdSubject" type="text" name="spdSubject" placeholder="By subject">
+        <label for="spdCreator">By creator</label>
+        <input id="spdCreator" type="text" name="spdCreator" placeholder="By creator"><br>
+        <button type="submit" class="submit-button">Search public decks</button>
+    </form>
+    </div>
+    <ol id="deck-list" class="deck-list">
         {{#each publicDeck}}
-            <li><a href="/publicdecks/{{this._id}}">{{this.name}}</a> ||| Subject: {{this.subject}} ||| Creator: {{this.creator}}</li>
+            <li><a href="/publicdecks/{{this._id}}">{{this.name}}</a> ||| [Subject]: {{this.subject}} ||| Creator: {{this.creator}}</li>
         {{/each}}
     </ol>
     {{#if loggedIn}}

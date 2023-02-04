@@ -21,7 +21,7 @@ const createFolder = async(username,folderName) => {        //same idea as creat
     let newFolder={
         _id:ObjectId().toString(),
         name:folderName,
-        dateCreated: `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()} ${fn(d.getHours())}:${fn(d.getMinutes())}:${fn(d.getSeconds())}`,
+        dateCreated: `${d.getFullYear()}-${fn(d.getMonth()+1)}-${fn(d.getDate())} ${fn(d.getHours())}:${fn(d.getMinutes())}:${fn(d.getSeconds())}`,
         decks:[]            //contains deck id's
     }
     const insertFolder=await userCollection.updateOne(

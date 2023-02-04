@@ -101,6 +101,30 @@ app.use('/yourpage/folders/:id', async(req,res,next) => {
     }
     next()
 })
+//checks if the user owns that deck in the quiz section
+app.use('/yourpage/study/*/:id', async(req,res,next) => {
+    if(!req.session.user){
+        return res.redirect('/')
+    }
+    let id=req.params.id
+    let username=req.session.user.username
+    try{            //validating input
+        id=validation.checkId(id)
+        username=validation.checkUsername(username)
+    }
+    catch(e){
+        console.log(e)
+    }
+    try{            //checking ownership    
+        doesOwn=await decks.getDeckById(username,id)    //if getDeckById for a username throws, the user does not own that deck
+    }
+    catch(e){
+        console.log("You do not own that deck")
+        return res.redirect('/yourpage/study')
+    }
+    next()
+})
+
 app.use('/login', (req, res, next) => {
     if (req.session.user) {
         return res.redirect('/yourpage');

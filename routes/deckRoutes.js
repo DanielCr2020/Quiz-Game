@@ -33,6 +33,39 @@ router
             console.log(e)
             return
         }
+        try{
+            name=validation.checkDeckName(req.body.name);
+            subject=validation.checkSubject(req.body.subject);
+            newDeck=await decks.createDeck(username,name,subject,false)
+            newDeckId=validation.checkId(newDeck._id.toString())        //checks the new deck id
+        }
+        catch(e){
+            console.log(e)
+            res.json({
+                title:"Cannot create deck",
+                success:false,
+                error:e.toString()
+            })
+            res.status(400)
+            return
+        }
+        //was able to create deck
+        res.json({
+            subject:newDeck.subject,
+            newName:newDeck.name,
+            id:newDeckId,
+            success:true
+        })
+    })
+    .patch(async(req,res) => {      //  AJAX        /decks patch route. When you sort or search your decks
+        let username=undefined;
+        try{
+            username=validation.checkUsername(req.session.user.username)
+        }   
+        catch(e){
+            console.log(e)
+            return
+        }
         if(req.body.sortBy){
             let userDecks=undefined;
             try{
@@ -77,31 +110,6 @@ router
             foundDecks=foundDecks.map((deck)=>{return {id:deck._id,name:deck.name,subject:deck.subject}})
             res.json({
                 foundDecks:foundDecks,
-                success:true
-            })
-        }
-        else {
-            try{
-                name=validation.checkDeckName(req.body.name);
-                subject=validation.checkSubject(req.body.subject);
-                newDeck=await decks.createDeck(username,name,subject,false)
-                newDeckId=validation.checkId(newDeck._id.toString())        //checks the new deck id
-            }
-            catch(e){
-                console.log(e)
-                res.json({
-                    title:"Cannot create deck",
-                    success:false,
-                    error:e.toString()
-                })
-                res.status(400)
-                return
-            }
-            //was able to create deck
-            res.json({
-                subject:newDeck.subject,
-                newName:newDeck.name,
-                id:newDeckId,
                 success:true
             })
         }

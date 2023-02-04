@@ -59,6 +59,10 @@ p.left-align {
     text-align: left;
     margin-left: 20px;
 }
+h1 {
+    font-size: 60px;
+    color:white;
+}
 h2 {
     text-align: center;
     color:var(--h2-color);
@@ -171,7 +175,6 @@ a.home {
 .deck-page-column {
     display:flex;
     flex-direction: column;
-    justify-content: center;
     width:100%;
     margin-left: 60px;
 }
@@ -218,7 +221,7 @@ nav.bottom-row {
 .card-page-column {
     display:flex;
     flex-direction: column;
-    justify-content: center;
+    align-content: left;
     width:100%;
     margin-left: 0px;
     color:white;
@@ -261,6 +264,13 @@ select#addDeck {
 select#removeDeck {
     font-size: 24px;
 }
+div.folders-div {
+    display: flex;
+    flex-direction: row;
+}
+div.folder-decks {
+    margin-left: 20px;
+}
 /*public decks*/
 h1.public-deck-h1 {
     font-size: 60px;
@@ -270,6 +280,20 @@ h3.deckInfo {
     font-size: 32px;
     color:var(--text-blue);
 }
+/*study page*/
+h1.study-header {
+    font-size: 60px;
+    text-align: center;
+    color:white;
+}
+div.study-page-div {
+    font-size: 40px;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
 /*errors*/
 .error {
     font-size: 30px;

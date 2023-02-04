@@ -106,6 +106,38 @@ router
             loggedIn:req.session.user ? true : false
         })
     })
+    .patch(async(req,res) => {           // searching public decks
+        let publicDecks=undefined;
+        try{
+            publicDecks=await decks.getPublicDecks()
+        }
+        catch(e){
+            console.log(e)
+            res.status(500).send("Internal server error (POST /publicdecks)")
+            return
+        }
+        if(req.body.searchPublicDecks){
+            if(req.body.searchByName!==' '){
+                publicDecks=publicDecks.filter((deck)=> {
+                    return deck.name.toLowerCase().includes(req.body.searchByName.toLowerCase())
+                })
+            }
+            if(req.body.searchBySubject!==' '){
+                publicDecks=publicDecks.filter((deck) => {
+                    return deck.subject.toLowerCase().includes(req.body.searchBySubject.toLowerCase())
+                })
+            }
+            if(req.body.searchByCreator!==' '){
+                publicDecks=publicDecks.filter((deck) => {
+                    return deck.creator.includes(req.body.searchByCreator.toLowerCase())
+                })
+            }
+        }
+        res.json({
+            decksFound:publicDecks,
+            success:true
+        })
+    })
 router
     .route('/publicdecks/:id')
     .get(async(req,res) => {        //single public deck (not logged in)

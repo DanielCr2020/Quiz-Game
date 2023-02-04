@@ -254,7 +254,6 @@
     //for saving a public deck
     $("#save-deck").on('click', function (event) {
         event.preventDefault()
-        //let id=window.location.href.substring(window.location.href.indexOf('/publicdecks/')+13)     //gets deck id
         let requestConfig = {
             method:"POST"
         }
@@ -266,7 +265,6 @@
             else{
                 errorDiv.hidden=false
                 errorDiv.innerText=responseMessage.error
-                //alert(responseMessage.error)
             }
         })
     })
@@ -298,7 +296,7 @@
         let sortBy=$('#sortDecksBy').val();
         if(sortBy){
             let requestConfig={
-                method:"POST",
+                method:"PATCH",
                 data:{sortBy:sortBy,decksOnPage:$('#deck-list')[0].innerText.replace(/( - \[Subject\]:)/g,"")}
             }
             $.ajax(requestConfig).then(function (responseMessage) {
@@ -317,21 +315,43 @@
         event.preventDefault()
         let searchBy=$('#searchDecksInput').val().trim()
         if(!searchBy) searchBy=" "
-        if(searchBy){
-            let requestConfig={
-                method:"POST",
-                data:{searchBy:searchBy}
-            }
-            $.ajax(requestConfig).then(function (responseMessage) {
-                if(responseMessage.success){
-                    let searched=""
-                    for(deck of responseMessage.foundDecks){
-                        searched+=`<li><a href="decks/${deck.id}">${deck.name}</a> - [Subject]: ${deck.subject}</li>\n`
-                    }
-                    $('#deck-list')[0].innerHTML=searched
-                }
-                $('#filter-decks-form').trigger('reset')
-            })
+        let requestConfig={
+            method:"PATCH",
+            data:{searchBy:searchBy}
         }
+        $.ajax(requestConfig).then(function (responseMessage) {
+            if(responseMessage.success){
+                let searched=""
+                for(deck of responseMessage.foundDecks){            //builds the html from the found decks sent from the request
+                    searched+=`<li><a href="decks/${deck.id}">${deck.name}</a> - [Subject]: ${deck.subject}</li>\n`
+                }
+                $('#deck-list')[0].innerHTML=searched
+            }
+            $('#filter-decks-form').trigger('reset')
+        })
+    })
+    //for searching public decks
+    $('#search-public-decks-form').submit(function (event) {
+        event.preventDefault()
+        let searchByName=$('#spdName').val().trim();
+        let searchBySubject=$('#spdSubject').val().trim();
+        let searchByCreator=$('#spdCreator').val().trim();
+        if(!searchByName) searchByName=' '
+        if(!searchBySubject) searchBySubject=' '
+        if(!searchByCreator) searchByCreator=' '
+        let requestConfig={
+            method:"PATCH",          
+            data:{searchPublicDecks:true,searchByName:searchByName,searchBySubject:searchBySubject,searchByCreator:searchByCreator}
+        }
+        $.ajax(requestConfig).then(function (responseMessage) {
+            if(responseMessage.success){
+                let searched=""
+                for(deck of responseMessage.decksFound){        //builds the html from the found decks sent from the request
+                    searched+=`<li><a href=/publicdecks/${deck.id}">${deck.name}</a> ||| [Subject]: ${deck.subject} ||| Creator: ${deck.creator}`
+                }
+                $('#deck-list')[0].innerHTML=searched
+            }
+            $('#search-public-decks-form').trigger('reset')
+        })
     })
 })(window.jQuery)
