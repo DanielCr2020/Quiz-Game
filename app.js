@@ -37,13 +37,17 @@ app.use('/yourpage/decks/:id/:cardNumber', async(req,res,next) => {         //ca
     if (!req.session.user) {
         return res.redirect('/')
     } 
-    let doesOwn=undefined; let id=undefined; let username=undefined;
+    let deckId,userId,deck;
     try{
-        id=validation.checkId(req.params.id)
-        username=validation.checkUsername(req.session.user.username)
-        doesOwn=await decks.getDeckById(username,id)   //if getDeckById for a username throws, the user does not have that deck
+        deckId=validation.checkId(req.params.id)
+        userId=validation.checkId(req.session.user.userId)
+        deck=await decks.getDeckById(deckId);
     }
     catch(e){
+        console.log(e)
+        return res.redirect('/yourpage/decks')
+    }
+    if(deck.ownerId.toString()!==userId.toString()){
         console.log("You don't own that deck")
         return res.redirect('/yourpage/decks')
     }
@@ -56,20 +60,20 @@ app.use('/yourpage/decks/:id', async (req,res,next) => {     //if the id in the 
         return res.redirect('/')
     }
     if(!res.ignore) {   //used for when we are at a card route. If we are, we have already verified ownership. We need to therefore ignore to avoid issues.
-        let id=req.params.id
-        let username=req.session.user.username
+        let deckId=req.params.id
+        let userId=req.session.user.userId
+        let deck;
         try{        //validating input
-            id=validation.checkId(id)
-            username=validation.checkUsername(username)
+            deckId=validation.checkId(deckId)
+            userId=validation.checkId(userId)
+            deck=await decks.getDeckById(deckId);
         }
         catch(e){
             console.log(e)
+            return res.redirect('/yourpage/decks')
         }
-        try{        //checking ownership
-            doesOwn=await decks.getDeckById(username,id)    //if getDeckById for a username throws, the user does not own that deck
-        }
-        catch(e){
-            console.log("You do not own that deck")
+        if(deck.ownerId.toString()!==userId.toString()){
+            console.log("You don't own that deck")
             return res.redirect('/yourpage/decks')
         }
         next()
@@ -83,19 +87,20 @@ app.use('/yourpage/folders/:id', async(req,res,next) => {
     if (!req.session.user) {
         return res.redirect('/')
     }
-    let id=req.params.id
-    let username=req.session.user.username
+    let folderId=req.params.id
+    let userId=req.session.user.userId
     try{            //validating input
-        id=validation.checkId(id)
-        username=validation.checkUsername(username)
+        folderId=validation.checkId(folderId)
+        userId=validation.checkId(userId)
     }
     catch(e){
         console.log(e)
     }
     try{            //checking ownership    
-        doesOwn=await folders.getFolderById(username,id)    //if getFolderById for a username throws, the user does not own that folder
+        doesOwn=await folders.getFolderById(userId,folderId)    //if getFolderById for a userId throws, the user does not own that folder
     }
     catch(e){
+        console.log(e)
         console.log("You do not own that folder")
         return res.redirect('/yourpage/folders')
     }
@@ -106,20 +111,19 @@ app.use('/yourpage/study/*/:id', async(req,res,next) => {
     if(!req.session.user){
         return res.redirect('/')
     }
-    let id=req.params.id
-    let username=req.session.user.username
+    let deckId=req.params.id
+    let userId=req.session.user.userId
+    let deck;
     try{            //validating input
-        id=validation.checkId(id)
-        username=validation.checkUsername(username)
+        deckId=validation.checkId(deckId)
+        userId=validation.checkId(userId)
+        deck=await decks.getDeckById(deckId)    //if getDeckById for a username throws, the user does not own that deck
     }
     catch(e){
         console.log(e)
     }
-    try{            //checking ownership    
-        doesOwn=await decks.getDeckById(username,id)    //if getDeckById for a username throws, the user does not own that deck
-    }
-    catch(e){
-        console.log("You do not own that deck")
+    if(deck.ownerId.toString()!==userId.toString()){
+        console.log("You don't own that deck")
         return res.redirect('/yourpage/study')
     }
     next()

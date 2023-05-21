@@ -10,9 +10,9 @@
             <p class="create-card-p">Create a card</p><br>
             <p id="error2" class="error-p" hidden>{{errorMessage}}</p>
             <label for="cardFrontInput">Front</label>
-            <input id="cardFrontInput" type="text" name="cardFrontInput" class="cardFrontInput"><br>
+            <input id="cardFrontInput" type="text" name="cardFrontInput" class="cardFrontInput" placeholder="Front of new card"><br>
             <label for="cardBackInput">Back</label>
-            <textarea id="cardBackInput" rows="4" cols="28"></textarea> <br>
+            <textarea id="cardBackInput" rows="4" cols="27" placeholder="Back of new card"></textarea> <br>
             <button type="submit">Add card</button>
             </form>     <!-- editing deck --> <br>
             <p id="error" class="error-p" hidden>{{errorMessage}}</p>
@@ -43,7 +43,7 @@
     <p id="error3" class="error-p" hidden>{{errorMessage}}</p>
     <form action="/yourpage/decks/{{id}}" id="send-deck-form" class="create-deck-form">
         <label for="usernameInput">Send this deck to another user</label><br>
-        <input id="usernameInput" type="text" name="usernameInput"><br>
+        <input id="usernameInput" type="text" name="usernameInput" placeholder="Username"><br>
         <button type="submit">Send this deck</button>
     </form>
     <!-- bottom row -->

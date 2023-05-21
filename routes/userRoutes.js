@@ -46,7 +46,7 @@ router
     .get(async (req,res) => {               //get login page
         res.render(path.resolve('views/login.handlebars'),{title: "Login"})
     })
-    .post(async (req,res) => {          //  logging in
+    .post(async (req,res) => {          //  post /login     logging in
         let check=false
         let username=false; let password=false;
         try{

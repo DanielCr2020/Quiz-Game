@@ -19,7 +19,7 @@ router
         let username=undefined; let userDecks=undefined;
         try{
             username=validation.checkUsername(req.session.user.username)
-            userDecks=await decks.getUsersDecks(username);
+            userDecks=await users.getUsersDecks(username);
         }
         catch(e){
             if(!userDecks) res.status(500).send("Internal server error (GET /yourpage/study)")

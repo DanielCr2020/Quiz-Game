@@ -31,9 +31,7 @@ function checkPassword(password,notCreating){       //2nd parameter differentiat
 
 function checkId(id){
     if(!id) throw new Error("id is not defined")
-    if(typeof id!=='string') throw new Error('id is not a string')
-    if(id.trim().length===0) throw new Error("id cannot be an empty string or just spaces")
-    id=id.trim(); id=xss(id);
+    if(id.toString().trim().length<=0) throw new Error("id cannot be an empty string or just spaces")
     if(!ObjectId.isValid(id)) throw new Error("Invalid object id")
     return id
 }
@@ -68,6 +66,15 @@ function checkCard(contents,forb){      //it's forbin time
     return contents
 }
 
+function checkCardNumber(deck,cardNumber){
+    if(!deck) throw "You must supply a deck"
+    if((/[^0-9]/).test(cardNumber)) throw "Card number must be a number"
+    cardNumber=Number.parseInt(cardNumber);
+    let cards=deck.cards;
+    if(cardNumber<0 || cardNumber>=cards.length) throw "Card number is in invalid range"
+    return cardNumber;
+}
+
 function checkFolderName(folderName){
     if(!folderName) throw new Error("Folder name is not defined")
     if(typeof folderName!=='string') throw new Error("Folder name is not a string")
@@ -84,5 +91,6 @@ module.exports = {
     checkDeckName,
     checkSubject,
     checkCard,
-    checkFolderName
+    checkFolderName,
+    checkCardNumber
 }

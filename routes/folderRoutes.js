@@ -10,10 +10,11 @@ router
     .route('/')
     .get(async(req,res) => {            //      /yourpage/folders   get route.  Getting all folders
         if(!req.body) {res.status(400); return}
-        let folders=undefined; let username=undefined;
+        let folders,userId,username;
         try{
+            userId=validation.checkId(req.session.user.userId)
             username=validation.checkUsername(req.session.user.username)
-            folders=await users.getUsersFolders(username)
+            folders=await users.getUsersFolders(userId)
         }
         catch(e){
             console.log(e)
@@ -27,14 +28,12 @@ router
     })
     .post(async(req,res) => {       //      /yourpage/folders       post route.     Creating a folder
         if(!req.body) {res.status(400); return}
-        let folderName=undefined; let username=undefined;
-        let newFolder=undefined; let yourFolders=undefined; let newFolderId=undefined;
+        let folderName,userId,newFolder,newFolderId
         try{
             folderName=validation.checkFolderName(req.body.name)
-            username=validation.checkUsername(req.session.user.username)
-            yourFolders=await users.getUsersFolders(username)
-            newFolder=await folders.createFolder(username,folderName)
-            newFolderId=validation.checkId(newFolder._id.toString())        //checks id after folder was made
+            userId=validation.checkId(req.session.user.userId)
+            newFolder=await folders.createFolder(userId,folderName)
+            newFolderId=newFolder._id       //checks id after folder was made
         }
         catch(e){
             console.log(e)
@@ -56,22 +55,29 @@ router
     .route('/:id')      //      single folder route
     .get(async(req,res) => {    //      /yourpage/folders/:id   get route.  Getting a single folder
         if(!req.body) {res.status(400); return}
-        let username=undefined; let decksInFolder=undefined; let folderId=undefined;
-        let folder=undefined; let userDecks=undefined
+        let userId,decksInFolder=[],folderId,folder,userDecks
         try{            //getting decks in that folder
-            username=validation.checkUsername(req.session.user.username)
+            userId=validation.checkId(req.session.user.userId)
             folderId=validation.checkId(req.params.id)
-            folder=await folders.getFolderById(username,folderId)
-            userDecks=await decks.getUsersDecks(username)
+            folder=await folders.getFolderById(userId,folderId)
+            userDecks=await users.getUsersDecks(userId)
             decksInFolder=folder.decks
         }
         catch(e){
             console.log(e)
-            return
+            return res.json(e).status(500)
         }
         //for each deck id in the folder, get its respective deck
         decksInFolder=await Promise.all(decksInFolder.map(async deckId => {
-            return await decks.getDeckById(username, deckId)})
+            let decc;
+            try{
+                decc=await decks.getDeckById(deckId)
+            }
+            catch(e){
+                console.log(e)
+                res.send(e).status(500);
+            }
+            return decc})
         )
 
         res.render(path.resolve('views/folders-pages/singleFolder.handlebars'),{
@@ -84,14 +90,13 @@ router
     })
     .post(async(req,res) => {           //  /yourpage/folders/:id   post route.     Adding a deck to a folder
         if(!req.body) {res.status(400); return}
-        let username=undefined; let folderId=undefined; let userDecks=undefined; let deckToAddName=undefined;
-        let deckToAdd=undefined;
+        let userId,folderId,deckToAddName,deckToAdd
         try{
-            username=validation.checkUsername(req.session.user.username)
+            userId=validation.checkId(req.session.user.userId)
             folderId=validation.checkId(req.params.id)
             deckToAddName=validation.checkDeckName(req.body.deckToAddName)
-            deckToAdd=await decks.getDeckByName(username,deckToAddName)
-            await folders.addDeckToFolder(username,folderId,deckToAdd._id)
+            deckToAdd=await decks.getDeckByName(userId,deckToAddName)
+            await folders.addDeckToFolder(userId,folderId,deckToAdd._id)
         }
         catch(e){
             console.log(e)
@@ -111,13 +116,13 @@ router
     })
     .patch(async(req,res) => {          //  /yourpage/folders/:id  patch route.  change folder name
         if(!req.body) {res.sendStatus(400); return;}
-        let folderId=undefined; let username=undefined; let newFolderName=undefined; 
+        let folderId,userId,newFolderName;
         try{
-            username=validation.checkUsername(req.session.user.username)
+            userId=validation.checkId(req.session.user.userId)
             folderId=validation.checkId(req.params.id)
-            folder=await folders.getFolderById(username,folderId)
+            folder=await folders.getFolderById(userId,folderId)
             newFolderName=validation.checkFolderName(req.body.newFolderName)
-            await folders.editFolder(username,folderId,newFolderName)
+            await folders.editFolder(userId,folderId,newFolderName)
         }
         catch(e){
             console.log(e)
@@ -133,10 +138,10 @@ router
         })
     })
     .delete(async(req,res) => {         //      /yourpage/folders/:id    delete route. Delete a single folder. Or remove deck from folder
-        let folderId=req.params.id; let username=req.session.user.username; let deckToRemove=undefined;
+        let folderId=req.params.id; let userId=req.session.user.userId; let deckToRemove=undefined;
         try{
             folderId=validation.checkId(folderId)
-            username=validation.checkUsername(username)
+            userId=validation.checkId(userId)
         }
         catch(e){
             console.log(e)
@@ -150,8 +155,8 @@ router
             let deckToRemoveName=undefined;
             try{
                 deckToRemoveName=validation.checkDeckName(req.body.deckToRemoveName)
-                deckToRemove=await decks.getDeckByName(username,deckToRemoveName)
-                await folders.removeDeckFromFolder(username,folderId,deckToRemove._id)
+                deckToRemove=await decks.getDeckByName(userId,deckToRemoveName)
+                await folders.removeDeckFromFolder(userId,folderId,deckToRemove._id)
             }
             catch(e){
                 console.log(e)
@@ -170,7 +175,7 @@ router
         }
         else{           //      if we are deleting a folder
             try{
-                await folders.deleteFolder(username,folderId)
+                await folders.deleteFolder(userId,folderId)
             }
             catch(e){
                 console.log(e)

@@ -2,6 +2,7 @@ const bcrypt=require('bcryptjs')
 const saltRounds=11
 const mongoCollections = require('../config/mongoCollections');
 const users = mongoCollections.users
+const decks = mongoCollections.decks
 const validation=require('../validation')
 const {ObjectId} = require('mongodb');
 
@@ -33,34 +34,50 @@ const checkUser = async(username,password) => {         //when a user logs in
     if(!user) throw "Either the username or password is invalid"
     let user_hashed_password=user.password
     let comparison=await bcrypt.compare(password,user_hashed_password)
-    if(comparison) return {authenticatedUser: true}
+    if(comparison) return {authenticatedUser: true, userId:user._id}
     throw "Either the username or password is invalid"
 }
 
-const getUsersDecks = async(username) => {
-    username=validation.checkUsername(username)
-    const userCollection=await users();
-    const userDeckList=await userCollection.findOne({username:username.toLowerCase()})
-    if(!userDeckList) throw new Error(`Cannot get ${username}'s decks`)
-    return userDeckList.decks
+const getUsersDecks = async(userId) => {
+    userId=(validation.checkId(userId));
+    const decksCollection=await decks();
+    const userDecks=await decksCollection.find({creatorId:new ObjectId(userId)}).toArray();
+    if(!userDecks) throw "Could not get user's decks"
+    return userDecks
 }
 
-const getUsersFolders = async(username) => {
-    username=validation.checkUsername(username)
+const getUsersFolders = async(userId) => {
+    userId=validation.checkId(userId); userId=new ObjectId(userId);
     const userCollection=await users();
-    const userFolderList=await userCollection.findOne({username:username.toLowerCase()})
-    if(!userFolderList) throw new Error(`Cannot get ${username}'s folders`)
-    return userFolderList.folders
+    const user=await userCollection.findOne({_id: userId})
+    if(!user) throw new Error(`Cannot get user`)
+    return user.folders
 }
 
 const getAllUsers = async()=>{
     const userCollection=await users()
     let userList=await userCollection.find({}).toArray()
     if(!userList) throw new Error("Could not get all users")
-    for(u of userList){
-        u._id=u._id.toString()
-    }
     return userList
+}
+
+const checkOwnership = async(thingToCheck,userId,itemId) => {
+    if(userId) userId=validation.checkId(userId);
+    if(itemId) itemId=validation.checkId(itemId);
+    if(thingToCheck=='deck'){
+
+    }
+    else if(thingToCheck=='folder'){
+
+    }
+}
+
+const getUsernameFromId = async(userId) => {
+    userId=validation.checkId(userId);
+    const userCollection=await users();
+    const user=await userCollection.findOne({_id:new ObjectId(userId)});
+    if(!user) throw `Unable to find username for user with id of ${userId}`
+    return user.username;
 }
 
 module.exports = {
@@ -68,5 +85,7 @@ module.exports = {
     checkUser,
     getUsersDecks,
     getUsersFolders,
-    getAllUsers
+    getAllUsers,
+    checkOwnership,
+    getUsernameFromId
 }
