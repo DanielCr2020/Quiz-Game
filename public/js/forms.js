@@ -178,7 +178,9 @@
         $.ajax(requestConfig).then(function (responseMessage) {
             if(responseMessage.success){
                 errorDiv.hidden=true
-                $('#folderName').replaceWith(`<h1 id="folderName" class="deckName">${responseMessage.folderName}</h1>`)
+                if(responseMessage.folderName!=''){     //workaround for the page displaying a blank folder name (not renamed in db)
+                    $('#folderName').replaceWith(`<h1 id="folderName" class="deckName">${responseMessage.folderName}</h1>`)
+                }
             }
             else{
                 errorDiv.hidden=false

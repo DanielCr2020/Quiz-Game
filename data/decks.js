@@ -186,7 +186,11 @@ const deleteCard = async(deckId,cardNumber) => {
 
 const getPublicDecks=async() => {
     const deckCollection=await decks()
+    const userCollection=await users()
     const publicDecks=await deckCollection.find({public:true}).toArray()
+    for(let i in publicDecks) {     //adds creator to deck object
+        publicDecks[i].creator=(await userCollection.findOne({_id:new ObjectId(publicDecks[i].creatorId)})).username
+    }
     return publicDecks
 }
 

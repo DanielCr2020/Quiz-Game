@@ -116,13 +116,18 @@ router
     })
     .patch(async(req,res) => {          //  /yourpage/folders/:id  patch route.  change folder name
         if(!req.body) {res.sendStatus(400); return;}
-        let folderId,userId,newFolderName;
+        let folderId,userId,newFolderName=req.body.newFolderName,ignore=false;
         try{
             userId=validation.checkId(req.session.user.userId)
             folderId=validation.checkId(req.params.id)
             folder=await folders.getFolderById(userId,folderId)
-            newFolderName=validation.checkFolderName(req.body.newFolderName)
-            await folders.editFolder(userId,folderId,newFolderName)
+            if(newFolderName && folder.name!=newFolderName){        //if the name exists and is different
+                newFolderName=validation.checkFolderName(req.body.newFolderName)
+                if(folder.name.toLowerCase()==newFolderName.toLowerCase()){
+                    ignore=true;
+                }
+                await folders.editFolder(userId,folderId,newFolderName,ignore)
+            }
         }
         catch(e){
             console.log(e)

@@ -39,14 +39,14 @@ const deleteFolder=async(userId,folderId) => {        //deletes folder from arra
     return updatedUser
 }
 
-const editFolder=async(userId,folderId,newFolderName) => {        //renaming a folder
+const editFolder=async(userId,folderId,newFolderName,ignore) => {        //renaming a folder. Ignore will tell to ignore same name error. Used for renaming to same name with different case
     userId=validation.checkId(userId);      userId=new ObjectId(userId)
     folderId=validation.checkId(folderId); folderId=new ObjectId(folderId)
     newFolderName=validation.checkFolderName(newFolderName);
     const userCollection=await users();
     const folderCreator=await userCollection.findOne({_id:userId})
     for(folder of folderCreator.folders)            //makes sure the new name is not the existing name of a folder
-        if(folder.name.toLowerCase()===newFolderName.toLowerCase()) 
+        if(folder.name.toLowerCase()===newFolderName.toLowerCase() && !ignore) 
             throw "You already have a folder named "+newFolderName
     
     const editedFolder=userCollection.updateOne(

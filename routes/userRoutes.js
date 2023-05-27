@@ -135,6 +135,7 @@ router
         }
         res.json({
             decksFound:publicDecks,
+            loggedIn:req.session.user ? true : false,
             success:true
         })
     })
