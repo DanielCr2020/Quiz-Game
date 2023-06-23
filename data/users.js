@@ -80,6 +80,14 @@ const getUsernameFromId = async(userId) => {
     return user.username;
 }
 
+const getUserIdFromName = async(username) => {
+    username=validation.checkUsername(username).toLowerCase();
+    const userCollection=await users();
+    const user=await userCollection.findOne({username:username});
+    if(!user) throw `Unable to find user id for user with name of ${username}`
+    return user._id;
+}
+
 module.exports = {
     createUser,
     checkUser,
@@ -87,5 +95,6 @@ module.exports = {
     getUsersFolders,
     getAllUsers,
     checkOwnership,
-    getUsernameFromId
+    getUsernameFromId,
+    getUserIdFromName
 }

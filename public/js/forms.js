@@ -349,7 +349,7 @@
             if(responseMessage.success){
                 let searched=""
                 for(deck of responseMessage.decksFound){        //builds the html from the found decks sent from the request
-                    searched+=`<li><a href=/publicdecks/${deck.id}">${deck.name}</a> ||| [Subject]: ${deck.subject} ||| Creator: ${deck.creator}`
+                    searched+=`<li><a href=/publicdecks/${deck._id}>${deck.name}</a> ||| [Subject]: ${deck.subject} ||| Creator: ${deck.creator}`
                 }
                 $('#deck-list')[0].innerHTML=searched
             }

@@ -1,5 +1,10 @@
 <main>
-    <header>Created by: {{creator}} ||| on: {{dateCreated}}</header>
+    <header>
+        Created by: {{creator}} ||| on: {{dateCreated}}
+        {{#if sentBy}}
+            ||| Sent by: {{sender}}
+        {{/if}}
+    </header>
     <div class="cards-div">
         <div class="deck-labels">
             <h1 id="deckName" class="deckName">{{deckName}}</h1>

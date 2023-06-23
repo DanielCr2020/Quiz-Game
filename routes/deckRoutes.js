@@ -124,12 +124,15 @@ router
     .route('/:id')
     .get(async(req,res) => {                //      /yourpage/decks/:id    get     showing a user's decks (singleDeck)
         if(!req.body) {res.sendStatus(400); return}
-        let userId,deckId,deck,username;
+        let userId,deckId,deck,username,sender;
         try{
             userId=validation.checkId(req.session.user.userId)
             deckId=validation.checkId(req.params.id)
             username=await users.getUsernameFromId(userId);
             deck=await decks.getDeckById(deckId)
+            if(deck.sentBy){
+                sender = await users.getUsernameFromId(deck.sentBy);
+            }
         }
         catch(e){
             console.log(e)
@@ -144,23 +147,25 @@ router
             deckSubject:deck.subject,
             dateCreated:deck.dateCreated,
             public:deck.public,
-            card:deck.cards
+            card:deck.cards,
+            sender:sender,
+            sentBy: sender ? true : false
         })
     })
     .post(async(req,res) => {           //   AJAX   /:id        post route  (making a new card)   or sending deck to another user
         if(!req.body) {res.sendStatus(400); return;}
+        let front, back, userId, newCard, deckId;
+        userId=validation.checkId(req.session.user.userId)
+        deckId=validation.checkId(req.params.id)
         if(!req.body.sendDeck) {            // creating a new card
-            let front=undefined; let back=undefined; let username=undefined; let newCard=undefined; let deckId=undefined;
             try{            //validation
                 front=validation.checkCard(req.body.front,"front")
                 back=validation.checkCard(req.body.back,"back")
-                username=validation.checkUsername(req.session.user.username)
-                deckId=validation.checkId(req.params.id)
-                newCard=await decks.createCard(username,deckId,front,back)
+                newCard=await decks.createCard(deckId,front,back)
             }
             catch(e){
                 console.log(e)
-                res.json({
+                res.status(400).json({
                     title:"Cannot create card",
                     success:false,
                     error:e
@@ -176,13 +181,12 @@ router
             })
         }
         else {          //sending a deck to another user
-            let receiver=undefined; let deckId=undefined; let username=undefined; let currentDeck=undefined;
             try{
-                receiver=validation.checkUsername(req.body.user)
+                let username=validation.checkUsername(req.body.user);
+                let recipientId=await users.getUserIdFromName(username)
                 deckId=validation.checkId(req.params.id)
-                username=validation.checkUsername(req.session.user.username)
-                currentDeck=await decks.getDeckById(username,deckId)            //inserting the same deck with all the same info
-                await decks.createDeck(username,currentDeck.name,currentDeck.subject,false,currentDeck.cards,currentDeck.dateCreated,receiver,false)
+                currentDeck=await decks.getDeckById(deckId)            //inserting the same deck with all the same info
+                await decks.sendDeckToUser(deckId,userId,recipientId)
             }
             catch(e){
                 console.log(e)
@@ -198,7 +202,7 @@ router
         }
     })
     .patch(async(req,res) => {          //   AJAX   /:id    patch       updating a deck
-        let deckId,userId,deckToEdit;let newDeckName=req.body.name; let newDeckSubject=req.body.subject;
+        let deckId,userId,deckToEdit; let newDeckName=req.body.name; let newDeckSubject=req.body.subject;
         try{
             deckId=validation.checkId(req.params.id)
             userId=validation.checkId(req.session.user.userId)

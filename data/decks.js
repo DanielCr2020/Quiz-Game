@@ -12,7 +12,7 @@ const createDeck = async (creatorId,deckName,subject,isPublic) => {
     const usersCollection = await users();
     const decksCollection = await decks();
     const userDecks = await userFunctions.getUsersDecks(creatorId);
-    for(deck of userDecks){
+    for(let deck of userDecks){
         if(deck.name.toLowerCase()===deckName.toLowerCase())  {    //checks if you/user already has that deck
             throw "You already have a deck called "+deckName
         }
@@ -22,7 +22,6 @@ const createDeck = async (creatorId,deckName,subject,isPublic) => {
         subject:subject,
         dateCreated:new Date(),
         creatorId:creatorId,
-        ownerId:creatorId,          // this is for public decks. If you save a public deck, the creator may not necessarily be the owner
         public:isPublic,
         cards:[]
     }
@@ -35,8 +34,56 @@ const createDeck = async (creatorId,deckName,subject,isPublic) => {
     return newDeck
 }
 
-const savePublicDeck = async() => {
+const savePublicDeck = async(deckId,creatorId) => {
+    deckId=validation.checkId(deckId); deckId=new ObjectId(deckId)
+    creatorId=validation.checkId(creatorId); creatorId=new ObjectId(creatorId)
+    const deckCollection=await decks();
+    const userCollection=await users();
+    const userDecks = await userFunctions.getUsersDecks(creatorId);
+    let deck=await deckCollection.findOne({_id:deckId});
+    for(let deck1 of userDecks){
+        if(deck.name.toLowerCase()===deck1.name.toLowerCase())  {    //checks if you/user already has that deck
+            throw "You already have a deck called "+deck1.name
+        }
+    }
+    deck._id=new ObjectId();
+    deck.creatorId=creatorId;
+    deck.public=false;
+    deck.sentBy=undefined;      //  "Resets" the sending chain.
+    let insertDeck=await deckCollection.insertOne(deck)
+    if(!insertDeck.insertedId) throw "Could not successfully insert deck into decks collection"
+    let addToUser=await userCollection.updateOne({_id:creatorId},
+        {$push:{decks:new ObjectId(insertDeck.insertedId)}}
+    )
+    if(!addToUser.modifiedCount) throw "Could not add this deck to the user"
+    return deck
+}
 
+const sendDeckToUser = async(deckId,senderId,recipientId) => {
+    deckId=validation.checkId(deckId); deckId=new ObjectId(deckId);
+    senderId=validation.checkId(senderId); senderId=new ObjectId(senderId);
+    recipientId=validation.checkId(recipientId); recipientId=new ObjectId(recipientId);
+    const recipientName = await userFunctions.getUsernameFromId(recipientId);
+    const deckCollection=await decks();
+    const userCollection=await users();
+    let decc=await deckCollection.findOne({_id:deckId});
+    const recipientDecks = await userFunctions.getUsersDecks(recipientId);
+    for(let deck of recipientDecks){
+        if(deck.name.toLowerCase()===decc.name.toLowerCase()) {    //checks if you/user already has that deck
+            throw `${recipientName} already has a deck called ${decc.name}`
+        }
+    }
+    decc.sentBy=senderId;
+    decc._id=new ObjectId()     //changing the object id but keeping everything else the same. Re-inserting it.
+    decc.creatorId=recipientId;
+    decc.public=false;
+    let insertDeck = await deckCollection.insertOne(decc)
+    if(!insertDeck.insertedId) throw "Could not successfully insert deck into decks collection"
+    let addToUser = await userCollection.updateOne({_id:recipientId},
+        {$push:{decks:new ObjectId(insertDeck.insertedId)}}  
+    )
+    if(!addToUser.modifiedCount) throw "Could not add this deck to the user"
+    return decc
 }
 
 const deleteDeck = async(userId,deckId) => {
@@ -85,7 +132,7 @@ const getDeckByName = async(userId,deckName) => {         //userId is needed so 
     userId=validation.checkId(userId); userId=new ObjectId(userId);
     const deckCollection=await decks()
     const deckFound=await deckCollection.findOne(
-        {name:deckName,ownerId:userId},
+        {name:deckName,creatorId:userId},
     )
     if(!deckFound) throw ("Unable to find that deck (name)")
     return deckFound
@@ -118,8 +165,7 @@ const getCard=async(deckId,cardNumber) => {
     return userDeck.cards[cardNumber]           //user.decks._id.cards[cardNumber]
 }
 
-const createCard = async(username,deckId,cardFront,cardBack) => {
-    username=validation.checkUsername(username),
+const createCard = async(deckId,cardFront,cardBack) => {
     deckId=validation.checkId(deckId); deckId=new ObjectId(deckId)
     cardFront=validation.checkCard(cardFront,"front")
     cardBack=validation.checkCard(cardBack,"back")
@@ -211,6 +257,8 @@ function sortDecks(decksList,sortBy,om){        //om is order multiplier. 1 sort
 
 module.exports = {
     createDeck,
+    savePublicDeck,
+    sendDeckToUser,
     deleteDeck,
     getDeckById,
     getDeckByOnlyId,

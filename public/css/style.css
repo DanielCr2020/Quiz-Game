@@ -102,9 +102,9 @@ select {
 }
 .login-form button:hover {
     background-color: black;
-    color:white;
+    color:var(--button-hover-color);
     border-color: white;
-    transition: 0.25s;
+    transition: 100ms;
 }
 /*Titles for pages*/
 .title {
@@ -130,6 +130,7 @@ a {
 }
 a:hover {
     color:white;
+    transition: 100ms;
 }
 a.home {
     font-size: 28px;

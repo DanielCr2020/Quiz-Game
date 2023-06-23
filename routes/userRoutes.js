@@ -9,11 +9,20 @@ router
     .route('/')
     .get(async (req,res) => {           //homepage route
         let isLoggedIn=false; let username=undefined;
-        if(req.session.user) {
-            isLoggedIn=true
-            username=validation.checkUsername(req.session.user.username)
+        try{
+            if(req.session.user) {
+                isLoggedIn=true
+                username=validation.checkUsername(req.session.user.username)
+                validation.checkId(req.session.user.userId)
+            }
+            res.render(path.resolve("views/startPage.handlebars"),{title:"Quiz Game",loggedIn:isLoggedIn,username:username})
         }
-        res.render(path.resolve("views/startPage.handlebars"),{title:"Quiz Game",loggedIn:isLoggedIn,username:username})
+        catch(e){
+            console.log(e)
+            res.status(400).send(e)
+            return
+        }
+
     })
 
 router
@@ -64,7 +73,7 @@ router
             res.status(500).send("Internal Server Error (POST /login)")
             return
         }
-        if(check.authenticatedUser){
+        if(check.authenticatedUser){        //setting up express session data
             req.session.user={username:username, userId:check.userId}
             res.redirect('/yourpage')
         }
@@ -73,11 +82,19 @@ router
 router
     .route('/yourpage')
     .get(async (req,res) => {              //user's homepage
-        let u=validation.checkUsername(req.session.user.username)
-        res.render(path.resolve('views/private.handlebars'),{
-            username:u,
-            title:u+"'s page"
-        })
+        let u;
+        try{
+            u=validation.checkUsername(req.session.user.username)
+            res.render(path.resolve('views/private.handlebars'),{
+                username:u,
+                title:u+"'s page"
+            })
+        }
+        catch(e){
+            console.log(e)
+            res.status(400).send(e)
+            return
+        }
     })
 
 router
@@ -129,7 +146,7 @@ router
             }
             if(req.body.searchByCreator!==' '){
                 publicDecks=publicDecks.filter((deck) => {
-                    return deck.creator.includes(req.body.searchByCreator.toLowerCase())
+                    return deck.creator.toLowerCase().includes(req.body.searchByCreator.toLowerCase())
                 })
             }
         }
@@ -142,7 +159,7 @@ router
 router
     .route('/publicdecks/:id')
     .get(async(req,res) => {        //single public deck (not logged in)
-        let publicDecks=undefined; let publicDeck=undefined; let deckId=undefined;
+        let publicDecks, publicDeck, deckId;
         try{
             deckId=validation.checkId(req.params.id)
             publicDecks=await decks.getPublicDecks()
@@ -160,12 +177,12 @@ router
         })
     })
     .post(async(req,res) => {           //saving a public deck          (only possible when you are logged in)
-        let publicDeck=undefined; let id=undefined; let username=undefined;
+        let publicDeck, deckId, userId;
         try{
-            id=validation.checkId(req.params.id)
-            username=validation.checkUsername(req.session.user.username)
-            publicDeck=await decks.getDeckByOnlyId(id)
-            await decks.createDeck(publicDeck.creator,publicDeck.name,publicDeck.subject,false,publicDeck.cards,publicDeck.dateCreated,username,true)
+            deckId=validation.checkId(req.params.id)
+            userId=validation.checkId(req.session.user.userId)
+            publicDeck=await decks.getDeckById(deckId)
+            await decks.savePublicDeck(deckId,userId)
             //if(username) username=validation.checkUsername(username)
         }
         catch(e){

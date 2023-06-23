@@ -47,7 +47,7 @@ app.use('/yourpage/decks/:id/:cardNumber', async(req,res,next) => {         //ca
         console.log(e)
         return res.redirect('/yourpage/decks')
     }
-    if(deck.ownerId.toString()!==userId.toString()){
+    if(deck.creatorId.toString()!==userId.toString()){
         console.log("You don't own that deck")
         return res.redirect('/yourpage/decks')
     }
@@ -72,7 +72,7 @@ app.use('/yourpage/decks/:id', async (req,res,next) => {     //if the id in the 
             console.log(e)
             return res.redirect('/yourpage/decks')
         }
-        if(deck.ownerId.toString()!==userId.toString()){
+        if(deck.creatorId.toString()!==userId.toString()){
             console.log("You don't own that deck")
             return res.redirect('/yourpage/decks')
         }
@@ -122,7 +122,7 @@ app.use('/yourpage/study/*/:id', async(req,res,next) => {
     catch(e){
         console.log(e)
     }
-    if(deck.ownerId.toString()!==userId.toString()){
+    if(deck.creatorId.toString()!==userId.toString()){
         console.log("You don't own that deck")
         return res.redirect('/yourpage/study')
     }
