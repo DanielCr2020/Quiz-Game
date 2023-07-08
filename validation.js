@@ -32,7 +32,7 @@ function checkPassword(password,notCreating){       //2nd parameter differentiat
 function checkId(id){
     if(!id) throw new Error("id is not defined")
     if(id.toString().trim().length<=0) throw new Error("id cannot be an empty string or just spaces")
-    if(!ObjectId.isValid(id)) throw new Error("Invalid object id")
+    if(!ObjectId.isValid(id)) throw new Error(`Invalid object id: ${id}`)
     return id
 }
 
