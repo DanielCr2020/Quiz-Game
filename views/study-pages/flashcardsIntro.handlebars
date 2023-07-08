@@ -1,0 +1,10 @@
+<main>
+    <h1 class="center-h1">Flashcards for {{deck.name}}</h1>
+    <div class="flashcards-div">
+        <h2>This deck has {{cardCount}} card(s)</h2>
+        <br/>
+        <form action="/yourpage/study/flashcards/{{deck._id}}" method="POST">
+            <button type="submit" class="submit-button">Begin</button>
+        </form>
+    </div>
+</main>

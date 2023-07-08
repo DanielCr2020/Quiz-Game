@@ -284,7 +284,7 @@ h3.deckInfo {
     color:var(--text-blue);
 }
 /*study page*/
-h1.study-header {
+h1.center-h1 {
     font-size: 60px;
     text-align: center;
     color:white;
@@ -295,6 +295,15 @@ div.study-page-div {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+}
+
+/*flashcards*/
+div.flashcards-div {
+    display: flex;
+    flex-direction: column;
+    padding-inline: 30%;
+    /* justify-content: space-between; */
+    text-align: center;
 }
 
 /*errors*/

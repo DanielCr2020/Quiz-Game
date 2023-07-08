@@ -95,6 +95,7 @@ app.use('/yourpage/folders/:id', async(req,res,next) => {
     }
     catch(e){
         console.log(e)
+        return res.redirect('/yourpage/folders')
     }
     try{            //checking ownership    
         doesOwn=await folders.getFolderById(userId,folderId)    //if getFolderById for a userId throws, the user does not own that folder
@@ -107,7 +108,7 @@ app.use('/yourpage/folders/:id', async(req,res,next) => {
     next()
 })
 //checks if the user owns that deck in the quiz section
-app.use('/yourpage/study/*/:id', async(req,res,next) => {
+app.use('/yourpage/study/:gameType/:id', async(req,res,next) => {
     if(!req.session.user){
         return res.redirect('/')
     }
@@ -120,7 +121,31 @@ app.use('/yourpage/study/*/:id', async(req,res,next) => {
         deck=await decks.getDeckById(deckId)    //if getDeckById for a username throws, the user does not own that deck
     }
     catch(e){
-        console.log(e)
+        console.log("MIDDLEWARE",e)
+        return res.redirect('/yourpage/study')
+    }
+    if(deck.creatorId.toString()!==userId.toString()){
+        console.log("You don't own that deck")
+        return res.redirect('/yourpage/study')
+    }
+    next()
+})
+app.use('/yourpage/study/:gameType/:id/*', async(req,res,next) => {
+    if(!req.session.user){
+        return res.redirect('/')
+    }
+    let deckId=req.params.id
+    console.log("deck id (/*):",deckId)
+    let userId=req.session.user.userId
+    let deck;
+    try{            //validating input
+        deckId=validation.checkId(deckId)
+        userId=validation.checkId(userId)
+        deck=await decks.getDeckById(deckId)    //if getDeckById for a username throws, the user does not own that deck
+    }
+    catch(e){
+        console.log("MIDDLEWARE (/*)",e)
+        return res.redirect('/yourpage/study')
     }
     if(deck.creatorId.toString()!==userId.toString()){
         console.log("You don't own that deck")

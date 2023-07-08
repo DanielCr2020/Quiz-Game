@@ -110,7 +110,7 @@ const getDeckById = async(deckId) => {
     deckId=validation.checkId(deckId)
     const deckCollection=await decks()
     const deckFound=await deckCollection.findOne({_id:new ObjectId(deckId)})
-    if(!deckFound) throw `Unable to find that deck with id of ${deckId}`
+    if(!deckFound) throw `Unable to find deck with id of ${deckId}`
     return deckFound
 }
 
